@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Women's Clothing - BrandBox</title>
+
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:#f9f9f9; margin:0; padding:0; }
+        
+        .container { max-width: 1450px; margin: auto; padding: 20px; }
+        
+        .header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            padding: 15px 0; 
+            border-bottom: 2px solid #eee;
+            background: #fff;
+            margin-bottom: 20px;
+        }
+
+        .logo { font-weight: bold; font-size: 24px; text-transform: uppercase; cursor: pointer; letter-spacing: 1px; }
+        .logo span { color: #fe4c50; }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr); /* Mobile */
+            gap: 20px;
+        }
+
+        /* 5 Column Grid Logic for Desktop */
+        @media (min-width: 768px) { .grid { grid-template-columns: repeat(3, 1fr); } }
+        @media (min-width: 1024px) { .grid { grid-template-columns: repeat(4, 1fr); } }
+        @media (min-width: 1300px) { .grid { grid-template-columns: repeat(5, 1fr); } }
+
+        .card { 
+            background: white; 
+            padding: 12px; 
+            text-align: center; 
+            border-radius: 8px; 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06); 
+            transition: 0.3s;
+            display: flex;
+            flex-direction: column;
+        }
+        .card:hover { transform: translateY(-5px); box-shadow: 0 8px 15px rgba(0,0,0,0.1); }
+        
+        .card img { 
+            width: 100%; 
+            height: 300px; 
+            object-fit: cover; 
+            border-radius: 5px; 
+            background: #f0f0f0;
+        }
+
+        .card h4 { font-size: 14px; margin: 12px 0 5px; color: #333; font-weight: 600; }
+        .card p { font-weight: bold; color: #fe4c50; margin: 5px 0; font-size: 16px; }
+
+        .add-btn {
+            padding: 12px; 
+            width: 100%; 
+            background: #1e1e27; 
+            color: white; 
+            border: none; 
+            cursor: pointer; 
+            border-radius: 4px;
+            margin-top: auto;
+            font-weight: 600;
+            transition: 0.2s;
+        }
+        .add-btn:hover { background: #fe4c50; }
+
+        .cart-container { cursor: pointer; display: inline-block; position: relative; font-size: 22px; margin-left: 20px; }
+        .cart-container span { 
+            background: #fe4c50; color: white; border-radius: 50%; 
+            padding: 2px 6px; font-size: 12px; position: absolute; 
+            top: -8px; right: -10px; 
+        }
+
+        h3 { margin-bottom: 25px; font-weight: 600; border-left: 4px solid #fe4c50; padding-left: 15px; }
+        
+        .home-btn { 
+            background: none; border: 1px solid #ddd; padding: 8px 20px; 
+            cursor: pointer; border-radius: 4px; font-weight: 600;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+    <div class="header">
+        <div class="logo" onclick="goToHome()">BRAND<span>BOX</span></div>
+        <div style="display:flex; align-items:center;">
+            <button class="home-btn" onclick="goToHome()">Home</button>
+            <div class="cart-container" onclick="goToCart()">🛒 <span id="count">0</span></div>
+        </div>
+    </div>
+
+    <h3>Women's Apparel Collection</h3>
+
+    <div class="grid" id="productGrid">
+        </div>
+</div>
+
+<script>
+    // 25 Clothing items with verified Unsplash links
+    const products = [
+        { name: "Floral Maxi Dress", price: 1899, img: "https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?w=500" },
+        { name: "Denim Trucker Jacket", price: 2499, img: "https://images.unsplash.com/photo-1520975954732-35dd2229969e?w=500" },
+        { name: "High Rise Skinny Jeans", price: 1599, img: "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?w=500" },
+        { name: "White Peplum Top", price: 899, img: "https://images.unsplash.com/photo-1585487000160-6ebcfceb0d03?w=500" },
+        { name: "Yellow Sundress", price: 1200, img: "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=500" },
+        
+        { name: "Red Velvet Evening Gown", price: 4999, img: "https://images.unsplash.com/photo-1566174053879-31528523f8ae?w=500" },
+        { name: "Oversized Knit Sweater", price: 1750, img: "https://images.unsplash.com/photo-1434389677669-e08b4cac3105?w=500" },
+        { name: "Bohemian Pleated Skirt", price: 1100, img: "https://images.unsplash.com/photo-1582142306909-195724d33ffc?w=500" },
+        { name: "Embroidered Cotton Kurti", price: 1350, img: "https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?w=500" },
+        { name: "Pastel Pink Blazer", price: 2800, img: "https://images.unsplash.com/photo-1548142813-c348350df52b?w=500" },
+        
+        { name: "Striped Summer Jumpsuit", price: 1999, img: "https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=500" },
+        { name: "Classic Trench Coat", price: 5500, img: "https://images.unsplash.com/photo-1539533377285-a41fe58b6883?w=500" },
+        { name: "High-Waist Cargo Pants", price: 1450, img: "https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=500" },
+        { name: "Athletic Yoga Leggings", price: 999, img: "https://images.unsplash.com/photo-1506629082955-511b1aa562c8?w=500" },
+        { name: "Satin Wrap Top", price: 1150, img: "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=500" },
+        
+        { name: "Polka Dot Midi Skirt", price: 850, img: "https://images.unsplash.com/photo-1542295474-ac7996f7a0ef?w=500" },
+        { name: "Black Turtle Neck", price: 799, img: "https://images.unsplash.com/photo-1616150638538-ffb0679a3fc4?w=500" },
+        { name: "Emerald Green Suit", price: 6200, img: "https://images.unsplash.com/photo-1598929213452-52d72f63e307?w=500" },
+        { name: "Graphic Cotton Tee", price: 499, img: "https://images.unsplash.com/photo-1554568218-0f1715e72254?w=500" },
+        { name: "Plaid Office Trousers", price: 1650, img: "https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=500" },
+        
+        { name: "Leather Biker Jacket", price: 4200, img: "https://images.unsplash.com/photo-1551028719-00167b16eac5?w=500" },
+        { name: "Chiffon Party Top", price: 1250, img: "https://images.unsplash.com/photo-1539109136881-3be0616acf4b?w=500" },
+        { name: "Linen Wide-Leg Pants", price: 1800, img: "https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=500" },
+        { name: "Quilted Winter Vest", price: 2100, img: "https://images.unsplash.com/photo-1604176354204-926873ff3da9?w=500" },
+        { name: "Cocktail Little Black Dress", price: 2999, img: "https://images.unsplash.com/photo-1539008835270-031260b13af0?w=500" }
+    ];
+
+    const grid = document.getElementById('productGrid');
+
+    function loadProducts() {
+        products.forEach(p => {
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.innerHTML = `
+                <img src="${p.img}" alt="${p.name}">
+                <h4>${p.name}</h4>
+                <p>₹${p.price.toLocaleString()}</p>
+                <button class="add-btn" onclick="addToCart('${p.name}', ${p.price}, '${p.img}')">Add to Cart</button>
+            `;
+            grid.appendChild(card);
+        });
+    }
+
+    function addToCart(name, price, image){
+        let cart = JSON.parse(localStorage.getItem("cart")) || [];
+        cart.push({name, price, image});
+        localStorage.setItem("cart", JSON.stringify(cart));
+        updateCount();
+        alert(name + " added to cart!");
+    }
+
+    function updateCount(){
+        let cart = JSON.parse(localStorage.getItem("cart")) || [];
+        document.getElementById("count").innerText = cart.length;
+    }
+
+    function goToHome(){ window.location.href="Home.html"; }
+    function goToCart(){ window.location.href="Cart.html"; }
+
+    window.onload = () => {
+        loadProducts();
+        updateCount();
+    };
+</script>
+
+</body>
+</html>

@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Men's Collection - BrandBox</title>
+
+<style>
+body { font-family: 'Segoe UI', Arial, sans-serif; background:#f9f9f9; margin:0; padding:0; }
+/* Max width increased to 1400px to fit 5 columns comfortably */
+.container { max-width:1400px; margin:auto; padding:20px; }
+.header { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; border-bottom: 1px solid #ddd; padding-bottom: 10px; background: white; padding: 15px 20px; border-radius: 8px; }
+
+.grid {
+    display:grid;
+    grid-template-columns: repeat(2, 1fr); /* 2 products on mobile */
+    gap:20px;
+    margin-top:20px;
+}
+
+/* Responsive Grid Logic */
+@media (min-width: 768px) { .grid { grid-template-columns: repeat(3, 1fr); } }
+@media (min-width: 1024px) { .grid { grid-template-columns: repeat(4, 1fr); } }
+@media (min-width: 1300px) { .grid { grid-template-columns: repeat(5, 1fr); } }
+
+.card { 
+    background:white; 
+    padding:12px; 
+    text-align:center; 
+    border-radius:10px; 
+    box-shadow:0 2px 5px rgba(0,0,0,0.05); 
+    transition: transform 0.3s, box-shadow 0.3s;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.card:hover { transform: translateY(-5px); box-shadow: 0 8px 15px rgba(0,0,0,0.1); }
+
+.card img { 
+    width:100%; 
+    height:220px; 
+    object-fit: cover; 
+    border-radius:8px; 
+    background: #f0f0f0;
+}
+
+.card h4 { font-size: 15px; margin: 12px 0 5px; color: #333; }
+.price { color: #fe4c50; font-size: 17px; font-weight: bold; margin: 5px 0; }
+
+button {
+    padding:10px; width:100%; background:black; color:white; border:none; cursor:pointer; border-radius:5px;
+    margin-top:10px; font-weight: bold; transition: 0.2s;
+}
+
+button:hover { background: #fe4c50; }
+
+.cart-container { cursor:pointer; display:inline-block; position:relative; font-size:22px; margin-left:15px; }
+.cart-container span { background:red; color:white; border-radius:50%; padding:2px 6px; font-size:12px; position:absolute; top:-8px; right:-10px; }
+
+h3 { margin-top:30px; font-size: 24px; color: #1e1e27; border-left: 5px solid #fe4c50; padding-left: 15px; }
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="header">
+    <h2 onclick="goToHome()" style="cursor:pointer">Brand<span>Box</span></h2>
+    <div style="display:flex; align-items:center;">
+        <button onclick="goToHome()" style="width:auto; margin-top:0; margin-right:10px; padding: 8px 20px;">Home</button>
+        <div class="cart-container" onclick="goToCart()">🛒 <span id="count">0</span></div>
+    </div>
+</div>
+
+<h3>Men's Apparel Collection</h3>
+
+<div class="grid" id="productGrid">
+    </div>
+</div>
+
+<script>
+// 25 Products Data Array
+const products = [
+    { name: "Cotton Crew T-Shirt", price: 599, img: "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=500" },
+    { name: "Slim Fit Oxford Shirt", price: 999, img: "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=500" },
+    { name: "Dark Denim Jeans", price: 1499, img: "https://images.unsplash.com/photo-1542272604-787c3835535d?w=500" },
+    { name: "Streetwear Hoodie", price: 1299, img: "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=500" },
+    { name: "Biker Leather Jacket", price: 2999, img: "https://images.unsplash.com/photo-1551028719-00167b16eac5?w=500" },
+    { name: "Casual Navy Blazer", price: 3499, img: "https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=500" },
+    { name: "Classic Cargo Shorts", price: 799, img: "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?w=500" },
+    { name: "Graphic Street Tee", price: 699, img: "https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?w=500" },
+    { name: "Beige Chino Pants", price: 1299, img: "https://images.unsplash.com/photo-1473966968600-fa804b86d30b?w=500" },
+    { name: "Quilted Winter Vest", price: 1899, img: "https://images.unsplash.com/photo-1604176354204-926873ff3da9?w=500" },
+    { name: "Linen Summer Shirt", price: 1199, img: "https://images.unsplash.com/photo-1598911510795-75f447a427da?w=500" },
+    { name: "Athletic Joggers", price: 899, img: "https://images.unsplash.com/photo-1552346154-21d32810aba3?w=500" },
+    { name: "Checkered Flannel", price: 1099, img: "https://images.unsplash.com/photo-1588359348347-9bc6cbb6cf97?w=500" },
+    { name: "Trench Coat", price: 4500, img: "https://images.unsplash.com/photo-1544022613-e87ca75a784a?w=500" },
+    { name: "V-Neck Sweater", price: 1399, img: "https://images.unsplash.com/photo-1614975058789-41316d0e2e9c?w=500" },
+    { name: "Denim Trucker Jacket", price: 2199, img: "https://images.unsplash.com/photo-1576995853123-5a10305d93c0?w=500" },
+    { name: "Striped Polo Shirt", price: 850, img: "https://images.unsplash.com/photo-1586363104862-3a5e2ab60d99?w=500" },
+    { name: "Formal Dress Pants", price: 1599, img: "https://images.unsplash.com/photo-1594932224828-b4b059bdbf6f?w=500" },
+    { name: "Puffer Down Jacket", price: 3999, img: "https://images.unsplash.com/photo-1545594944-406c17208d02?w=500" },
+    { name: "Turtleneck Base Layer", price: 799, img: "https://images.unsplash.com/photo-1616150638538-ffb0679a3fc4?w=500" },
+    { name: "Camo Cargo Pants", price: 1350, img: "https://images.unsplash.com/photo-1517423738875-5ce310acd3da?w=500" },
+    { name: "Varsity Jacket", price: 2600, img: "https://images.unsplash.com/photo-1551488831-00ddcb6c6bd3?w=500" },
+    { name: "Summer Tank Top", price: 450, img: "https://images.unsplash.com/photo-1503341455253-b2e723bb3dbb?w=500" },
+    { name: "Corduroy Shirt", price: 1450, img: "https://images.unsplash.com/photo-1617137968427-85924c800a22?w=500" },
+    { name: "Wool Overcoat", price: 5200, img: "https://images.unsplash.com/photo-1536766768598-e092d3fdcf22?w=500" }
+];
+
+const productGrid = document.getElementById('productGrid');
+
+// Render products dynamically
+function renderProducts() {
+    products.forEach(product => {
+        const productCard = document.createElement('div');
+        productCard.className = 'card';
+        productCard.innerHTML = `
+            <img src="${product.img}" alt="${product.name}">
+            <div>
+                <h4>${product.name}</h4>
+                <p class="price">₹${product.price.toLocaleString()}</p>
+                <button onclick="addToCart('${product.name}', ${product.price}, '${product.img}')">Add to Cart</button>
+            </div>
+        `;
+        productGrid.appendChild(productCard);
+    });
+}
+
+function addToCart(name, price, image){
+    let cart = JSON.parse(localStorage.getItem("cart")) || [];
+    cart.push({name, price, image});
+    localStorage.setItem("cart", JSON.stringify(cart));
+    updateCount();
+    alert(name + " added to cart!");
+}
+
+function updateCount(){
+    let cart = JSON.parse(localStorage.getItem("cart")) || [];
+    document.getElementById("count").innerText = cart.length;
+}
+
+function goToHome(){ window.location.href="Home.html"; }
+function goToCart(){ window.location.href="Cart.html"; }
+
+window.onload = () => {
+    renderProducts();
+    updateCount();
+};
+</script>
+
+</body>
+</html>

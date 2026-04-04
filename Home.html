@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BrandBox</title>
+<link rel="stylesheet" href="Home.css">
+</head>
+
+<body>
+
+<div class="main">
+<div class="store-container">
+
+    <!-- Header -->
+    <div class="header">
+        <h2>BrandBox</h2>
+
+        <div class="cart-icon" onclick="goToCart()">
+            🛒 <span id="cartCount">0</span>
+        </div>
+    </div>
+
+    <!-- Search -->
+    <div class="search-box">
+        <input type="text" placeholder="Search products..." onkeyup="searchProduct()">
+    </div>
+
+    <!-- Categories -->
+    <div class="categories">
+        <button onclick="showAll()">All</button>
+        <button onclick="goToMen()">Men</button>
+        <button onclick="goToWomen()">Women</button>
+    </div>
+
+    <!-- PRODUCTS -->
+    <div class="product-grid" id="productGrid">
+
+        <!-- MEN -->
+        <div class="product-card" data-category="men">
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSoZ6mFf9kg8xwU8HHP7KDFjB47kReuRfmhaw&s">
+            <h4>T Shirt</h4>
+            <p>₹599</p>
+            <button onclick="addToCart('T-Shirt',599,this.parentElement.querySelector('img').src)">Add to Cart</button>
+        </div>
+
+        <div class="product-card" data-category="men">
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSRRbkyg4SMGgs4Y-BJ5vRVs1ywsICh1klSNw&s">
+            <h4>Shirt</h4>
+            <p>₹999</p>
+            <button onclick="addToCart('Shirt',999,this.parentElement.querySelector('img').src)">Add to Cart</button>
+        </div>
+
+        <!-- WOMEN -->
+        <div class="product-card" data-category="women">
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRB15NOG-bpQoGv_xVYR9Y_JhlG2aKKIPAWDg&s">
+            <h4>Kurti</h4>
+            <p>₹999</p>
+            <button onclick="addToCart('Kurti',999,this.parentElement.querySelector('img').src)">Add to Cart</button>
+        </div>
+
+        <div class="product-card" data-category="women">
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ95xXlNzSswqoiqL8CGzRfb582e5uak3edFg&s">
+            <h4>Jeans</h4>
+            <p>₹1499</p>
+            <button onclick="addToCart('Jeans',1499,this.parentElement.querySelector('img').src)">Add to Cart</button>
+        </div>
+
+    </div>
+
+</div>
+</div>
+
+<!--footer -->
+<footer class="main-footer">
+        <div class="footer-grid">
+            <div class="footer-column">
+                <h3>BrandBox</h3>
+                <p>Your one-stop destination for premium fashion. We deliver quality and style to your doorstep since 2017.</p>
+                <div class="social-icons">
+                    <span>Facebook</span> | <span>Instagram</span> | <span>Twitter</span>
+                </div>
+            </div>
+
+            <div class="footer-column">
+                <h4>Customer Support</h4>
+                <ul>
+                    <li><a href="#">Help Center</a></li>
+                    <li><a href="#">Track Order</a></li>
+                    <li><a href="#">Returns & Refunds</a></li>
+                    <li><a href="#">Shipping Info</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-column">
+                <h4>Privacy & Legal</h4>
+                <ul>
+                    <li><a href="#">Privacy Policy</a></li>
+                    <li><a href="#">Terms & Conditions</a></li>
+                    <li><a href="#">Cookie Policy</a></li>
+                    <li><a href="#">Security</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>&copy; 2026 BrandBox Private Ltd. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="Home.js"></script>
+</body>
+
+<script src="Home.js"></script>
+</body>
+</html>

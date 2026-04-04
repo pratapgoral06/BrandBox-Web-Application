@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BrandBox Login</title>
+    <link rel="stylesheet" href="LoginPage.css">
+</head>
+<body>
+
+<div class="main">
+
+    <div class="login-card">
+
+        <!-- Logo -->
+        <img src="../Project/Image/Logo.png" alt="BrandBox Logo" class="logo">
+
+        <h2>Welcome Back</h2>
+        <p>Login to continue</p>
+
+        <form id="loginForm">
+
+            <div class="input-box">
+                <input type="text" id="username" required>
+                <label>Username</label>
+            </div>
+
+            <div class="input-box">
+                <input type="password" id="password" required>
+                <label>Password</label>
+                <span class="toggle" onclick="togglePassword()">👁</span>
+            </div>
+
+            <div class="options">
+                <label><input type="checkbox"> Remember me</label>
+                <a href="#">Forgot?</a>
+            </div>
+
+            <button type="submit" class="btn">LOGIN</button>
+
+        </form>
+
+        <div class="signup">
+            Don't have account? <a href="SignUp.html">Sign up</a>
+        </div>
+
+    </div>
+
+</div>
+
+<script src="LoginPage.js"></script>
+</body>
+</html>
