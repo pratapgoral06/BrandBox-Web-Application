@@ -14,10 +14,11 @@
             display: flex; 
             justify-content: space-between; 
             align-items: center; 
-            padding: 15px 0; 
+            padding: 15px 20px; 
             border-bottom: 2px solid #eee;
             background: #fff;
             margin-bottom: 20px;
+            border-radius: 8px;
         }
 
         .logo { font-weight: bold; font-size: 24px; text-transform: uppercase; cursor: pointer; letter-spacing: 1px; }
@@ -25,11 +26,10 @@
 
         .grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr); /* Mobile */
+            grid-template-columns: repeat(2, 1fr); 
             gap: 20px;
         }
 
-        /* 5 Column Grid Logic for Desktop */
         @media (min-width: 768px) { .grid { grid-template-columns: repeat(3, 1fr); } }
         @media (min-width: 1024px) { .grid { grid-template-columns: repeat(4, 1fr); } }
         @media (min-width: 1300px) { .grid { grid-template-columns: repeat(5, 1fr); } }
@@ -43,6 +43,7 @@
             transition: 0.3s;
             display: flex;
             flex-direction: column;
+            justify-content: space-between;
         }
         .card:hover { transform: translateY(-5px); box-shadow: 0 8px 15px rgba(0,0,0,0.1); }
         
@@ -55,7 +56,7 @@
         }
 
         .card h4 { font-size: 14px; margin: 12px 0 5px; color: #333; font-weight: 600; }
-        .card p { font-weight: bold; color: #fe4c50; margin: 5px 0; font-size: 16px; }
+        .price-text { font-weight: bold; color: #fe4c50; margin: 5px 0; font-size: 16px; }
 
         .add-btn {
             padding: 12px; 
@@ -65,7 +66,7 @@
             border: none; 
             cursor: pointer; 
             border-radius: 4px;
-            margin-top: auto;
+            margin-top: 10px;
             font-weight: 600;
             transition: 0.2s;
         }
@@ -78,7 +79,7 @@
             top: -8px; right: -10px; 
         }
 
-        h3 { margin-bottom: 25px; font-weight: 600; border-left: 4px solid #fe4c50; padding-left: 15px; }
+        h3 { margin-top: 20px; margin-bottom: 25px; font-weight: 600; border-left: 4px solid #fe4c50; padding-left: 15px; }
         
         .home-btn { 
             background: none; border: 1px solid #ddd; padding: 8px 20px; 
@@ -100,42 +101,37 @@
 
     <h3>Women's Apparel Collection</h3>
 
-    <div class="grid" id="productGrid">
-        </div>
+    <div class="grid" id="productGrid"></div>
 </div>
 
 <script>
-    // 25 Clothing items with verified Unsplash links
+    // 25 Women's clothing items with specific descriptions
     const products = [
-        { name: "Floral Maxi Dress", price: 1899, img: "https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?w=500" },
-        { name: "Denim Trucker Jacket", price: 2499, img: "https://images.unsplash.com/photo-1520975954732-35dd2229969e?w=500" },
-        { name: "High Rise Skinny Jeans", price: 1599, img: "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?w=500" },
-        { name: "White Peplum Top", price: 899, img: "https://images.unsplash.com/photo-1585487000160-6ebcfceb0d03?w=500" },
-        { name: "Yellow Sundress", price: 1200, img: "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=500" },
-        
-        { name: "Red Velvet Evening Gown", price: 4999, img: "https://images.unsplash.com/photo-1566174053879-31528523f8ae?w=500" },
-        { name: "Oversized Knit Sweater", price: 1750, img: "https://images.unsplash.com/photo-1434389677669-e08b4cac3105?w=500" },
-        { name: "Bohemian Pleated Skirt", price: 1100, img: "https://images.unsplash.com/photo-1582142306909-195724d33ffc?w=500" },
-        { name: "Embroidered Cotton Kurti", price: 1350, img: "https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?w=500" },
-        { name: "Pastel Pink Blazer", price: 2800, img: "https://images.unsplash.com/photo-1548142813-c348350df52b?w=500" },
-        
-        { name: "Striped Summer Jumpsuit", price: 1999, img: "https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=500" },
-        { name: "Classic Trench Coat", price: 5500, img: "https://images.unsplash.com/photo-1539533377285-a41fe58b6883?w=500" },
-        { name: "High-Waist Cargo Pants", price: 1450, img: "https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=500" },
-        { name: "Athletic Yoga Leggings", price: 999, img: "https://images.unsplash.com/photo-1506629082955-511b1aa562c8?w=500" },
-        { name: "Satin Wrap Top", price: 1150, img: "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=500" },
-        
-        { name: "Polka Dot Midi Skirt", price: 850, img: "https://images.unsplash.com/photo-1542295474-ac7996f7a0ef?w=500" },
-        { name: "Black Turtle Neck", price: 799, img: "https://images.unsplash.com/photo-1616150638538-ffb0679a3fc4?w=500" },
-        { name: "Emerald Green Suit", price: 6200, img: "https://images.unsplash.com/photo-1598929213452-52d72f63e307?w=500" },
-        { name: "Graphic Cotton Tee", price: 499, img: "https://images.unsplash.com/photo-1554568218-0f1715e72254?w=500" },
-        { name: "Plaid Office Trousers", price: 1650, img: "https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=500" },
-        
-        { name: "Leather Biker Jacket", price: 4200, img: "https://images.unsplash.com/photo-1551028719-00167b16eac5?w=500" },
-        { name: "Chiffon Party Top", price: 1250, img: "https://images.unsplash.com/photo-1539109136881-3be0616acf4b?w=500" },
-        { name: "Linen Wide-Leg Pants", price: 1800, img: "https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=500" },
-        { name: "Quilted Winter Vest", price: 2100, img: "https://images.unsplash.com/photo-1604176354204-926873ff3da9?w=500" },
-        { name: "Cocktail Little Black Dress", price: 2999, img: "https://images.unsplash.com/photo-1539008835270-031260b13af0?w=500" }
+        { name: "Floral Maxi Dress", price: 1899, img: "https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?w=500", desc: "A beautiful floral print maxi dress made from breathable georgette. Perfect for brunch dates and summer outings." },
+        { name: "Denim Trucker Jacket", price: 2499, img: "https://images.unsplash.com/photo-1520975954732-35dd2229969e?w=500", desc: "Classic blue denim jacket for women with a slight oversized fit. Durable and stylish for all seasons." },
+        { name: "High Rise Skinny Jeans", price: 1599, img: "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?w=500", desc: "Stretchable high-waist skinny jeans in dark indigo. Designed to provide a perfect fit and all-day comfort." },
+        { name: "White Peplum Top", price: 899, img: "https://images.unsplash.com/photo-1585487000160-6ebcfceb0d03?w=500", desc: "Elegant white peplum top with lace detailing. Ideal for professional office wear or a sophisticated evening look." },
+        { name: "Yellow Sundress", price: 1200, img: "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=500", desc: "Bright yellow cotton sundress with adjustable straps. A lightweight and airy choice for hot summer days." },
+        { name: "Red Velvet Evening Gown", price: 4999, img: "https://images.unsplash.com/photo-1566174053879-31528523f8ae?w=500", desc: "Luxurious red velvet gown with a side slit. A premium choice for weddings, galas, and formal parties." },
+        { name: "Oversized Knit Sweater", price: 1750, img: "https://images.unsplash.com/photo-1434389677669-e08b4cac3105?w=500", desc: "Soft wool-blend oversized sweater in cream color. Keeps you warm and trendy during chilly winter months." },
+        { name: "Bohemian Pleated Skirt", price: 1100, img: "https://images.unsplash.com/photo-1582142306909-195724d33ffc?w=500", desc: "Midi-length pleated skirt with a bohemian aesthetic. Features an elastic waistband for a comfortable fit." },
+        { name: "Embroidered Cotton Kurti", price: 1350, img: "https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?w=500", desc: "Traditional cotton kurti with intricate hand embroidery. Breathable fabric perfect for ethnic daily wear." },
+        { name: "Pastel Pink Blazer", price: 2800, img: "https://images.unsplash.com/photo-1548142813-c348350df52b?w=500", desc: "Modern pastel pink blazer with a tailored fit. Adds a pop of color to your formal business attire." },
+        { name: "Striped Summer Jumpsuit", price: 1999, img: "https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=500", desc: "Navy and white striped jumpsuit with a waist tie. Versatile outfit for both work and vacation." },
+        { name: "Classic Trench Coat", price: 5500, img: "https://images.unsplash.com/photo-1539533377285-a41fe58b6883?w=500", desc: "Sophisticated beige trench coat with a belt. Water-resistant fabric that offers a timeless professional look." },
+        { name: "High-Waist Cargo Pants", price: 1450, img: "https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=500", desc: "Utility-inspired cargo pants with side pockets. Made from rugged cotton for a cool streetwear vibe." },
+        { name: "Athletic Yoga Leggings", price: 999, img: "https://images.unsplash.com/photo-1506629082955-511b1aa562c8?w=500", desc: "High-performance moisture-wicking yoga leggings. Offers 4-way stretch for maximum flexibility during workouts." },
+        { name: "Satin Wrap Top", price: 1150, img: "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=500", desc: "Silky satin wrap top in a champagne hue. Featuring a flattering V-neckline and elegant cuffed sleeves." },
+        { name: "Polka Dot Midi Skirt", price: 850, img: "https://images.unsplash.com/photo-1542295474-ac7996f7a0ef?w=500", desc: "Retro-style polka dot midi skirt. A lightweight fabric that moves beautifully with every step." },
+        { name: "Black Turtle Neck", price: 799, img: "https://images.unsplash.com/photo-1616150638538-ffb0679a3fc4?w=500", desc: "Essential black turtleneck top. A versatile layering piece for winter or professional office settings." },
+        { name: "Emerald Green Suit", price: 6200, img: "https://images.unsplash.com/photo-1598929213452-52d72f63e307?w=500", desc: "Stunning emerald green two-piece power suit. Tailored specifically for the modern, confident woman." },
+        { name: "Graphic Cotton Tee", price: 499, img: "https://images.unsplash.com/photo-1554568218-0f1715e72254?w=500", desc: "100% cotton graphic t-shirt with a feminist slogan. A casual yet meaningful addition to your wardrobe." },
+        { name: "Plaid Office Trousers", price: 1650, img: "https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=500", desc: "Classic plaid patterned trousers with a slim-fit cut. Looks great paired with a solid blouse and heels." },
+        { name: "Leather Biker Jacket", price: 4200, img: "https://images.unsplash.com/photo-1551028719-00167b16eac5?w=500", desc: "Women's premium black leather jacket with silver zippers. Gives an edgy look to any dress or jeans outfit." },
+        { name: "Chiffon Party Top", price: 1250, img: "https://images.unsplash.com/photo-1539109136881-3be0616acf4b?w=500", desc: "Sheer chiffon top with a floral underlay. Lightweight and stylish for parties and special events." },
+        { name: "Linen Wide-Leg Pants", price: 1800, img: "https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=500", desc: "Natural linen wide-leg trousers. Breathable and relaxed, perfect for tropical vacations or summer work days." },
+        { name: "Quilted Winter Vest", price: 2100, img: "https://images.unsplash.com/photo-1604176354204-926873ff3da9?w=500", desc: "Insulated quilted vest in a metallic finish. Lightweight but provides excellent core warmth during winter." },
+        { name: "Cocktail Little Black Dress", price: 2999, img: "https://images.unsplash.com/photo-1539008835270-031260b13af0?w=500", desc: "The essential 'Little Black Dress' for every woman. Features a classic fit-and-flare silhouette." }
     ];
 
     const grid = document.getElementById('productGrid');
@@ -144,14 +140,24 @@
         products.forEach(p => {
             const card = document.createElement('div');
             card.className = 'card';
+            // Click on image or text will open ProductDetails.html
             card.innerHTML = `
-                <img src="${p.img}" alt="${p.name}">
-                <h4>${p.name}</h4>
-                <p>₹${p.price.toLocaleString()}</p>
+                <div onclick="openDetails('${p.name}', ${p.price}, '${p.img}', '${p.desc}')" style="cursor:pointer">
+                    <img src="${p.img}" alt="${p.name}">
+                    <h4>${p.name}</h4>
+                    <p class="price-text">₹${p.price.toLocaleString()}</p>
+                </div>
                 <button class="add-btn" onclick="addToCart('${p.name}', ${p.price}, '${p.img}')">Add to Cart</button>
             `;
             grid.appendChild(card);
         });
+    }
+
+    // Stores selected product and description in memory and redirects
+    function openDetails(name, price, img, desc) {
+        const selectedProduct = { name, price, img, desc };
+        localStorage.setItem("selectedProduct", JSON.stringify(selectedProduct));
+        window.location.href = "ProductDetails.html";
     }
 
     function addToCart(name, price, image){

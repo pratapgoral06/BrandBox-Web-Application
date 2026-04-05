@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Details - BrandBox</title>
+    
+    <style>
+        /* Styling for the entire page background and font */
+        body { 
+            font-family: 'Segoe UI', Arial, sans-serif; 
+            background-color: #f4f4f4; 
+            margin: 0; 
+            padding: 20px; 
+        }
+
+        /* Back button link styling (Red accent color) */
+        .back-btn {
+            display: inline-block;
+            margin-bottom: 20px;
+            text-decoration: none;
+            color: #fe4c50;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        /* Main container holding the product image and information */
+        .product-container {
+            max-width: 1100px;
+            margin: 20px auto;
+            background: #fff;
+            padding: 40px;
+            display: flex; /* Aligns image and info side-by-side */
+            gap: 50px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        /* Container for the product photo (Left side) */
+        .product-image {
+            flex: 1; 
+            text-align: center;
+            background: #fdfdfd;
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        /* Actual product image styling */
+        .product-image img {
+            width: 100%;
+            max-width: 450px;
+            height: auto;
+            border-radius: 8px;
+            object-fit: contain; /* Keeps the full image visible without cropping */
+        }
+
+        /* Container for text information (Right side) */
+        .product-info {
+            flex: 1; 
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        /* Styling for Product Name */
+        .product-info h1 {
+            font-size: 36px;
+            margin: 0 0 10px 0;
+            color: #1e1e27;
+        }
+
+        /* Styling for Product Price */
+        .price {
+            font-size: 28px;
+            color: #fe4c50;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        /* Styling for the dynamic description text */
+        .description {
+            color: #666;
+            line-height: 1.8;
+            font-size: 16px;
+            margin-bottom: 25px;
+        }
+
+        /* Styling for availability, sizes, and material info */
+        .specs {
+            margin-bottom: 30px;
+            font-size: 15px;
+            color: #444;
+        }
+        .specs span { font-weight: bold; color: #000; }
+
+        /* Black 'Add to Cart' button styling */
+        .add-to-cart-btn {
+            background: #000;
+            color: #fff;
+            padding: 18px 40px;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s ease;
+            text-transform: uppercase;
+        }
+
+        /* Button hover effect: turns red and grows slightly */
+        .add-to-cart-btn:hover {
+            background: #fe4c50;
+            transform: scale(1.02);
+        }
+
+        /* Mobile responsiveness: stacks columns vertically on small screens */
+        @media (max-width: 850px) {
+            .product-container {
+                flex-direction: column; 
+                padding: 20px;
+                text-align: center;
+            }
+            .product-image img {
+                max-width: 100%;
+            }
+            .product-info {
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <a class="back-btn" onclick="history.back()">← Back to Collection</a>
+
+        <div class="product-container" id="productArea">
+            <p>Loading product information...</p>
+        </div>
+    </div>
+
+    <script>
+        // window.onload: Executes code as soon as the page is finished loading
+        window.onload = function() {
+            
+            // Step 1: Retrieve the product data stored in browser memory (LocalStorage)
+            const rawData = localStorage.getItem("selectedProduct");
+            
+            // Step 2: Check if data was successfully retrieved
+            if (rawData) {
+                // Parse the JSON string back into a JavaScript Object
+                const product = JSON.parse(rawData);
+                const displayArea = document.getElementById('productArea');
+
+                // Step 3: Use Template Literals (``) to inject HTML with product details
+                displayArea.innerHTML = `
+                    <div class="product-image">
+                        <img src="${product.img}" alt="${product.name}">
+                    </div>
+                    <div class="product-info">
+                        <h1>${product.name}</h1>
+                        
+                        <p class="price">₹${product.price.toLocaleString()}</p>
+                        
+                        <p class="description">
+                            ${product.desc || "High-quality premium fabric designed for ultimate comfort and long-lasting style. A perfect addition to your wardrobe."}
+                        </p>
+
+                        <div class="specs">
+                            <p><span>Availability:</span> In Stock (Ships in 24 hours)</p>
+                            <p><span>Sizes:</span> S, M, L, XL, XXL</p>
+                            <p><span>Material:</span> 100% High-Grade Fabric</p>
+                        </div>
+
+                        <button class="add-to-cart-btn" onclick="addToCart()">Add to Cart</button>
+                    </div>
+                `;
+            } else {
+                // Error message if no product data was found in memory
+                document.getElementById('productArea').innerHTML = "<h2>Oops! No product selected. Please go back.</h2>";
+            }
+        };
+
+        // Function to handle 'Add to Cart' logic
+        function addToCart() {
+            // Get the product details again from memory
+            const product = JSON.parse(localStorage.getItem("selectedProduct"));
+            
+            // Get existing cart items or initialize a new empty array []
+            let cart = JSON.parse(localStorage.getItem("cart")) || [];
+            
+            // Add (Push) the new product into the cart array
+            cart.push({
+                name: product.name,
+                price: product.price,
+                image: product.img
+            });
+            
+            // Save the updated cart back to LocalStorage memory
+            localStorage.setItem("cart", JSON.stringify(cart));
+            
+            // Alert popup to confirm the action to the user
+            alert(product.name + " has been added to your cart!");
+        }
+    </script>
+
+</body>
+</html>
