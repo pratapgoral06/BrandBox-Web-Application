@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Dashboard & Reports - BrandBox</title>
+
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+<style>
+    /* Main Styles for Screen */
+    body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; padding: 30px; margin: 0; }
+    .container { max-width: 1200px; margin: auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+    h2 { color: #222; margin-bottom: 20px; }
+    
+    /* Buttons */
+    .btn-group { float: right; margin-bottom: 20px; }
+    .btn { padding: 12px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; margin-left: 10px; transition: 0.3s; }
+    .refresh-btn { background: #007bff; color: white; }
+    .print-btn { background: #28a745; color: white; }
+    .btn:hover { opacity: 0.8; transform: translateY(-2px); }
+
+    /* Table Styling */
+    table { width: 100%; border-collapse: collapse; margin-top: 25px; }
+    th, td { padding: 15px; text-align: left; border-bottom: 1px solid #eee; }
+    th { background: #1a1a1a; color: white; text-transform: uppercase; font-size: 14px; }
+    
+    .status-badge { padding: 6px 12px; background: #d4edda; color: #155724; border-radius: 50px; font-size: 13px; font-weight: 600; }
+
+    /* PRINT STYLES: This hides buttons when printing the report */
+    @media print {
+        .btn-group, .refresh-btn, .print-btn { display: none !important; }
+        body { background: white; padding: 0; }
+        .container { box-shadow: none; border: none; width: 100%; max-width: 100%; }
+        h2::after { content: " - Sales Report"; }
+    }
+</style>
+</head>
+<body>
+
+<div class="container">
+    <div class="btn-group">
+        <button class="btn refresh-btn" onclick="fetchOrders()">🔄 Refresh</button>
+        <button class="btn print-btn" onclick="generateReport()">🖨️ Download Report</button>
+    </div>
+    
+    <h2>📦 BrandBox Admin Dashboard</h2>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Order ID</th>
+                <th>Date & Time</th>
+                <th>Customer Name</th>
+                <th>Amount (₹)</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody id="orderTableBody">
+            </tbody>
+    </table>
+</div>
+
+<script>
+/** * FIREBASE CONFIGURATION */
+const firebaseConfig = {
+    apiKey: "AIzaSyAmqyEPpanrmKD7rDz0aA6M_Un0bGFnevk",
+    authDomain: "brandbox-11fb7.firebaseapp.com",
+    projectId: "brandbox-11fb7",
+    storageBucket: "brandbox-11fb7.firebasestorage.app",
+    messagingSenderId: "214410646376",
+    appId: "1:214410646376:web:e8cd435ecd821dccec7cdd"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+/** * FETCH ORDERS FROM FIREBASE */
+function fetchOrders() {
+    const tableBody = document.getElementById("orderTableBody");
+    tableBody.innerHTML = "<tr><td colspan='5' style='text-align:center;'>Loading...</td></tr>";
+
+    db.collection("orders").orderBy("order_date", "desc").get()
+      .then((querySnapshot) => {
+          tableBody.innerHTML = ""; 
+          querySnapshot.forEach((doc) => {
+              const order = doc.data();
+              tableBody.innerHTML += `
+                  <tr>
+                      <td><strong>#${order.order_id}</strong></td>
+                      <td>${order.order_date}</td>
+                      <td>${order.customer_name}</td>
+                      <td>₹${order.total_amount}</td>
+                      <td><span class="status-badge">${order.status}</span></td>
+                  </tr>
+              `;
+          });
+      });
+}
+
+/** * GENERATE REPORT FUNCTION
+ * This opens the system print dialog. 
+ * Users can select "Save as PDF" to download the report.
+ */
+function generateReport() {
+    // Check if there is data to print
+    const rows = document.querySelectorAll("#orderTableBody tr");
+    if (rows.length === 0 || rows[0].innerText.includes("Loading")) {
+        alert("कृपया आधी डेटा लोड होऊ द्या!");
+        return;
+    }
+    window.print(); // Native browser print function
+}
+
+// Initial Call
+window.onload = fetchOrders;
+</script>
+
+</body>
+</html>

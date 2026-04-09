@@ -1,4 +1,5 @@
-/* RESET */
+/* --- 1. GLOBAL RESET --- */
+/* Resetting default margins/padding and setting base font */
 * {
     margin: 0;
     padding: 0;
@@ -6,17 +7,28 @@
     font-family: 'Segoe UI', sans-serif;
 }
 
-/* BACKGROUND */
+/* --- 2. BODY BACKGROUND --- */
+/* Soft gradient background for a modern look */
 body {
     background: linear-gradient(135deg, #e6eef5, #f4efe6);
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Ensures content and footer are centered */
+    min-height: 100vh;
 }
-
-/* MAIN */
+/* Logo */
+.logo {
+    width: 140px;
+    margin-bottom: 15px;
+}
+/* --- 3. MAIN AREA --- */
 .main {
+    width: 100%;
     padding: 30px 0;
 }
 
-/* CONTAINER */
+/* --- 4. STORE CONTAINER --- */
+/* Main white card that holds products. Width is set to 95% with 1100px max */
 .store-container {
     width: 95%;
     max-width: 1100px;
@@ -27,7 +39,7 @@ body {
     border-radius: 20px;
 }
 
-/* HEADER */
+/* --- 5. HEADER SECTION --- */
 .header {
     display: flex;
     justify-content: space-between;
@@ -38,14 +50,14 @@ body {
     font-size: 28px;
 }
 
-/* 🔥 CART ICON */
+/* --- 6. CART ICON & BADGE --- */
 .cart-icon {
     position: relative;
     font-size: 26px;
     cursor: pointer;
 }
 
-/* 🔴 CART COUNT BADGE */
+/* Red circle for item count in cart */
 .cart-icon span {
     position: absolute;
     top: -8px;
@@ -57,7 +69,7 @@ body {
     border-radius: 50%;
 }
 
-/* SEARCH */
+/* --- 7. SEARCH BOX --- */
 .search-box input {
     width: 100%;
     padding: 12px;
@@ -67,18 +79,19 @@ body {
     outline: none;
 }
 
-/* CATEGORIES */
+/* --- 8. CATEGORY BUTTONS --- */
 .categories {
     display: flex;
-    gap: 10px;
-    margin-bottom: 15px;
+    font-size: x-large;
+    gap: 15px;
+    margin-bottom: 20px;
 }
 
 .categories button {
     padding: 8px 16px;
     border-radius: 20px;
     border: none;
-    background: #eee;
+    background: #e5c1c1;
     cursor: pointer;
     transition: 0.3s;
 }
@@ -88,14 +101,15 @@ body {
     color: white;
 }
 
-/* GRID */
+/* --- 9. PRODUCT GRID --- */
+/* 4 columns for desktop view */
 .product-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 15px;
 }
 
-/* PRODUCT CARD */
+/* --- 10. PRODUCT CARD --- */
 .product-card {
     background: white;
     padding: 12px;
@@ -106,16 +120,14 @@ body {
 }
 
 .product-card:hover {
-    transform: translateY(-5px);
+    transform: translateY(-5px); /* Lift effect on hover */
 }
 
-/* IMAGE */
 .product-card img {
     width: 100%;
     border-radius: 10px;
 }
 
-/* TEXT */
 .product-card h4 {
     margin-top: 5px;
     font-size: 15px;
@@ -126,25 +138,7 @@ body {
     color: #1d4e89;
 }
 
-/* 📱 MOBILE */
-@media (max-width: 768px) {
-
-    .store-container {
-        padding: 15px;
-    }
-
-    .header h2 {
-        font-size: 22px;
-    }
-
-    .product-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-
-    .categories {
-        overflow-x: auto;
-    }
-}
+/* Buy button inside card */
 .product-card button {
     margin-top: 8px;
     padding: 8px;
@@ -160,25 +154,32 @@ body {
     background: #1d4e89;
 }
 
-/* Footer Styles */
+/* --- 11. FOOTER SECTION --- */
+/* Aligned to match the width of the store-container */
 .main-footer {
-    background-color: #1e1e27; /* Dark elegant background */
+    background-color: #1e1e27;
     color: #ffffff;
-    padding: 60px 20px 20px 20px;
+    padding: 40px 20px 20px 20px;
     margin-top: 50px;
-    border-radius: 10px 10px 0 0;
+    
+    /* MATCHING WIDTH LOGIC START */
+    width: 95%; 
+    max-width: 1100px; 
+    margin: 30px auto 40px auto; 
+    /* MATCHING WIDTH LOGIC END */
+    
+    border-radius: 20px; /* Fully rounded corners for a balanced look */
 }
 
 .footer-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 40px;
-    max-width: 1100px;
-    margin: 0 auto;
+    width: 100%;
 }
 
 .footer-column h3 {
-    color: #fe4c50; /* Brand accent color */
+    color: #fe4c50; /* Accent color for Brand Name */
     margin-bottom: 15px;
     font-size: 24px;
 }
@@ -189,7 +190,7 @@ body {
     font-weight: 600;
 }
 
-.footer-column p {
+.footer-column p, .footer-column ul li a {
     font-size: 14px;
     line-height: 1.6;
     color: #b5b5b5;
@@ -197,18 +198,10 @@ body {
 
 .footer-column ul {
     list-style: none;
-    padding: 0;
 }
 
 .footer-column ul li {
     margin-bottom: 10px;
-}
-
-.footer-column ul li a {
-    color: #b5b5b5;
-    text-decoration: none;
-    font-size: 14px;
-    transition: color 0.3s ease;
 }
 
 .footer-column ul li a:hover {
@@ -224,7 +217,7 @@ body {
 
 .footer-bottom {
     text-align: center;
-    margin-top: 50px;
+    margin-top: 40px;
     padding-top: 20px;
     border-top: 1px solid #333;
 }
@@ -234,9 +227,18 @@ body {
     color: #888;
 }
 
-/* Ensure footer works on mobile */
-@media (max-width: 600px) {
+/* --- 12. MOBILE RESPONSIVENESS --- */
+@media (max-width: 768px) {
+    .store-container, .main-footer {
+        width: 95%;
+        padding: 15px;
+    }
+
+    .product-grid {
+        grid-template-columns: repeat(2, 1fr); /* 2 columns for tablets/phones */
+    }
+
     .footer-grid {
-        text-align: center;
+        text-align: center; /* Center text for easier reading on small screens */
     }
 }

@@ -4,206 +4,141 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Product Details - BrandBox</title>
-    
     <style>
-        /* Styling for the entire page background and font */
-        body { 
-            font-family: 'Segoe UI', Arial, sans-serif; 
-            background-color: #f4f4f4; 
-            margin: 0; 
-            padding: 20px; 
+        body { font-family: 'Segoe UI', sans-serif; background: #f4f7f6; margin: 0; padding: 20px; }
+        .container { max-width: 1000px; margin: auto; }
+        .back-btn { text-decoration: none; color: #1d4e89; font-weight: bold; margin-bottom: 20px; display: inline-block; }
+        
+        .product-card-detail { 
+            display: flex; gap: 40px; background: white; padding: 30px; 
+            border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); 
         }
+        .img-side { flex: 1; text-align: center; }
+        .img-side img { width: 100%; max-width: 400px; border-radius: 10px; height: auto; object-fit: contain; }
+        
+        .info-side { flex: 1; }
+        .info-side h1 { font-size: 32px; margin-top: 0; color: #333; }
+        .price-tag { font-size: 26px; color: #fe4c50; font-weight: bold; margin: 15px 0; }
+        .desc-text { color: #555; line-height: 1.6; margin-bottom: 20px; font-size: 15px; border-bottom: 1px solid #eee; padding-bottom: 15px; }
+        
+        /* Color Selection Styling */
+        .selector-label { font-weight: bold; margin-bottom: 10px; display: block; color: #333; }
+        .color-options { display: flex; gap: 12px; margin-bottom: 20px; }
+        .color-dot {
+            width: 30px; height: 30px; border-radius: 50%;
+            border: 2px solid #ddd; cursor: pointer; transition: 0.3s;
+        }
+        .color-dot:hover { transform: scale(1.2); }
+        .color-dot.active { border-color: #000; box-shadow: 0 0 5px rgba(0,0,0,0.3); }
 
-        /* Back button link styling (Red accent color) */
-        .back-btn {
-            display: inline-block;
-            margin-bottom: 20px;
-            text-decoration: none;
-            color: #fe4c50;
-            font-weight: bold;
-            cursor: pointer;
-            font-size: 18px;
+        /* Size Selection Styling */
+        .size-options { display: flex; gap: 10px; margin-bottom: 25px; }
+        .size-box {
+            padding: 8px 15px; border: 1px solid #ddd; border-radius: 5px;
+            cursor: pointer; font-weight: bold; transition: 0.3s; background: #fff;
         }
+        .size-box:hover { border-color: #fe4c50; color: #fe4c50; }
+        .size-box.active { background: #fe4c50; color: #fff; border-color: #fe4c50; }
 
-        /* Main container holding the product image and information */
-        .product-container {
-            max-width: 1100px;
-            margin: 20px auto;
-            background: #fff;
-            padding: 40px;
-            display: flex; /* Aligns image and info side-by-side */
-            gap: 50px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        .buy-btn { 
+            background: #000; color: white; border: none; padding: 15px 30px; 
+            border-radius: 8px; cursor: pointer; font-size: 18px; width: 100%; transition: 0.3s;
         }
+        .buy-btn:hover { background: #1d4e89; }
 
-        /* Container for the product photo (Left side) */
-        .product-image {
-            flex: 1; 
-            text-align: center;
-            background: #fdfdfd;
-            padding: 20px;
-            border-radius: 10px;
-        }
-
-        /* Actual product image styling */
-        .product-image img {
-            width: 100%;
-            max-width: 450px;
-            height: auto;
-            border-radius: 8px;
-            object-fit: contain; /* Keeps the full image visible without cropping */
-        }
-
-        /* Container for text information (Right side) */
-        .product-info {
-            flex: 1; 
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-
-        /* Styling for Product Name */
-        .product-info h1 {
-            font-size: 36px;
-            margin: 0 0 10px 0;
-            color: #1e1e27;
-        }
-
-        /* Styling for Product Price */
-        .price {
-            font-size: 28px;
-            color: #fe4c50;
-            font-weight: bold;
-            margin-bottom: 20px;
-        }
-
-        /* Styling for the dynamic description text */
-        .description {
-            color: #666;
-            line-height: 1.8;
-            font-size: 16px;
-            margin-bottom: 25px;
-        }
-
-        /* Styling for availability, sizes, and material info */
-        .specs {
-            margin-bottom: 30px;
-            font-size: 15px;
-            color: #444;
-        }
-        .specs span { font-weight: bold; color: #000; }
-
-        /* Black 'Add to Cart' button styling */
-        .add-to-cart-btn {
-            background: #000;
-            color: #fff;
-            padding: 18px 40px;
-            border: none;
-            border-radius: 8px;
-            font-size: 18px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.3s ease;
-            text-transform: uppercase;
-        }
-
-        /* Button hover effect: turns red and grows slightly */
-        .add-to-cart-btn:hover {
-            background: #fe4c50;
-            transform: scale(1.02);
-        }
-
-        /* Mobile responsiveness: stacks columns vertically on small screens */
-        @media (max-width: 850px) {
-            .product-container {
-                flex-direction: column; 
-                padding: 20px;
-                text-align: center;
-            }
-            .product-image img {
-                max-width: 100%;
-            }
-            .product-info {
-                align-items: center;
-            }
-        }
+        @media (max-width: 768px) { .product-card-detail { flex-direction: column; } }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <a class="back-btn" onclick="history.back()">← Back to Collection</a>
-
-        <div class="product-container" id="productArea">
-            <p>Loading product information...</p>
-        </div>
+<div class="container">
+    <a href="Home.html" class="back-btn">← Back to Shopping</a>
+    
+    <div class="product-card-detail" id="mainArea">
+        <p>Loading Product Information...</p>
     </div>
+</div>
 
-    <script>
-        // window.onload: Executes code as soon as the page is finished loading
-        window.onload = function() {
-            
-            // Step 1: Retrieve the product data stored in browser memory (LocalStorage)
-            const rawData = localStorage.getItem("selectedProduct");
-            
-            // Step 2: Check if data was successfully retrieved
-            if (rawData) {
-                // Parse the JSON string back into a JavaScript Object
-                const product = JSON.parse(rawData);
-                const displayArea = document.getElementById('productArea');
+<script>
+    window.onload = function() {
+        const name = localStorage.getItem("pName");
+        const price = localStorage.getItem("pPrice");
+        const image = localStorage.getItem("pImage");
+        const desc = localStorage.getItem("pDesc");
 
-                // Step 3: Use Template Literals (``) to inject HTML with product details
-                displayArea.innerHTML = `
-                    <div class="product-image">
-                        <img src="${product.img}" alt="${product.name}">
+        const area = document.getElementById("mainArea");
+
+        if (name && image) {
+            const cleanImage = image.split('?')[0]; 
+            const freshImage = cleanImage + "?t=" + new Date().getTime();
+
+            area.innerHTML = `
+                <div class="img-side">
+                    <img src="${freshImage}" alt="${name}">
+                </div>
+                <div class="info-side">
+                    <h1>${name}</h1>
+                    <div class="price-tag">₹${price}</div>
+                    <p class="desc-text">${desc || "Premium quality product designed for style and comfort."}</p>
+                    
+                    <span class="selector-label">Select Color:</span>
+                    <div class="color-options">
+                        <div class="color-dot" style="background: #000;" onclick="selectOption(this, 'color', 'Black')"></div>
+                        <div class="color-dot" style="background: #fe4c50;" onclick="selectOption(this, 'color', 'Red')"></div>
+                        <div class="color-dot" style="background: #fff;" onclick="selectOption(this, 'color', 'White')"></div>
+                        <div class="color-dot" style="background: #1d4e89;" onclick="selectOption(this, 'color', 'Blue')"></div>
                     </div>
-                    <div class="product-info">
-                        <h1>${product.name}</h1>
-                        
-                        <p class="price">₹${product.price.toLocaleString()}</p>
-                        
-                        <p class="description">
-                            ${product.desc || "High-quality premium fabric designed for ultimate comfort and long-lasting style. A perfect addition to your wardrobe."}
-                        </p>
 
-                        <div class="specs">
-                            <p><span>Availability:</span> In Stock (Ships in 24 hours)</p>
-                            <p><span>Sizes:</span> S, M, L, XL, XXL</p>
-                            <p><span>Material:</span> 100% High-Grade Fabric</p>
-                        </div>
-
-                        <button class="add-to-cart-btn" onclick="addToCart()">Add to Cart</button>
+                    <span class="selector-label">Select Size:</span>
+                    <div class="size-options">
+                        <div class="size-box" onclick="selectOption(this, 'size', 'S')">S</div>
+                        <div class="size-box" onclick="selectOption(this, 'size', 'M')">M</div>
+                        <div class="size-box" onclick="selectOption(this, 'size', 'L')">L</div>
+                        <div class="size-box" onclick="selectOption(this, 'size', 'XL')">XL</div>
                     </div>
-                `;
-            } else {
-                // Error message if no product data was found in memory
-                document.getElementById('productArea').innerHTML = "<h2>Oops! No product selected. Please go back.</h2>";
-            }
-        };
 
-        // Function to handle 'Add to Cart' logic
-        function addToCart() {
-            // Get the product details again from memory
-            const product = JSON.parse(localStorage.getItem("selectedProduct"));
-            
-            // Get existing cart items or initialize a new empty array []
-            let cart = JSON.parse(localStorage.getItem("cart")) || [];
-            
-            // Add (Push) the new product into the cart array
-            cart.push({
-                name: product.name,
-                price: product.price,
-                image: product.img
-            });
-            
-            // Save the updated cart back to LocalStorage memory
-            localStorage.setItem("cart", JSON.stringify(cart));
-            
-            // Alert popup to confirm the action to the user
-            alert(product.name + " has been added to your cart!");
+                    <button class="buy-btn" onclick="addToCartNow()">Add to Cart 🛒</button>
+                    <p id="selectionHint" style="margin-top:10px; font-size:13px; color: #888;"></p>
+                </div>
+            `;
+        } else {
+            area.innerHTML = "<h2>Product not found! Please go back to Home.</h2>";
         }
-    </script>
+    }
+
+    // Function to handle Color and Size selection
+    function selectOption(element, type, value) {
+        // Remove active class from others in the same group
+        const selector = type === 'color' ? '.color-dot' : '.size-box';
+        document.querySelectorAll(selector).forEach(el => el.classList.remove('active'));
+        
+        // Add active class to clicked element
+        element.classList.add('active');
+        
+        // Store in localStorage for the cart
+        localStorage.setItem("selected" + type.charAt(0).toUpperCase() + type.slice(1), value);
+        
+        document.getElementById('selectionHint').innerText = "Selected " + type + ": " + value;
+    }
+
+    function addToCartNow() {
+        const name = localStorage.getItem("pName");
+        const price = localStorage.getItem("pPrice");
+        const image = localStorage.getItem("pImage");
+        const color = localStorage.getItem("selectedColor") || "Default";
+        const size = localStorage.getItem("selectedSize") || "M";
+
+        if (!name) return;
+
+        let cart = JSON.parse(localStorage.getItem("cart")) || [];
+        // Adding color and size to the cart item
+        cart.push({ name, price, image, color, size });
+        localStorage.setItem("cart", JSON.stringify(cart));
+
+        alert(`${name} (${size}, ${color}) added to cart! ✅`);
+        window.location.href = "Cart.html";
+    }
+</script>
 
 </body>
 </html>

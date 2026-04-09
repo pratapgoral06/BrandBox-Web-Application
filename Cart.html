@@ -3,61 +3,66 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>My Cart</title>
+<title>My Cart - BrandBox</title>
+
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
 <style>
+/* Styling for a Professional E-commerce Look */
 * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI', sans-serif; }
-body { background: linear-gradient(135deg, #e6eef5, #f4efe6); }
+body { background: linear-gradient(135deg, #e6eef5, #f4efe6); min-height: 100vh; }
 .container { max-width:900px; margin:auto; padding:25px; }
-h2 { margin-bottom:20px; }
-.cart-item { display:flex; gap:15px; background:white; padding:15px; border-radius:15px; margin-bottom:15px; align-items:center; flex-wrap:wrap; }
-.cart-item img { width:120px; height:120px; object-fit:cover; border-radius:10px; }
+h2 { margin-bottom:20px; color: #333; }
+.cart-item { display:flex; gap:15px; background:white; padding:15px; border-radius:15px; margin-bottom:15px; align-items:center; flex-wrap:wrap; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+.cart-item img { width:100px; height:100px; object-fit:cover; border-radius:10px; }
 .details { flex:1; }
-.details h4 { margin-bottom:5px; }
-.details p { font-weight:bold; color:#1d4e89; }
-button { padding:8px 12px; border:none; background:red; color:white; border-radius:8px; cursor:pointer; }
-button:hover { background:darkred; }
-.total { margin-top:20px; font-size:20px; font-weight:bold; }
-.checkout { margin-top:15px; padding:12px; width:100%; background:black; color:white; border-radius:10px; font-size:16px; cursor:pointer; }
-.checkout:hover { background:#333; }
-.continue { margin-top:10px; padding:10px; width:100%; background:#007bff; color:white; border-radius:10px; font-size:16px; cursor:pointer; text-align:center; border:none; }
-.continue:hover { background:#0056b3; }
+.details h4 { margin-bottom:5px; color: #444; }
+.details p { font-weight:bold; color:#1d4e89; font-size: 1.1rem; }
+.remove-btn { padding:8px 12px; border:none; background:#ff4d4d; color:white; border-radius:8px; cursor:pointer; transition: 0.3s; }
+.remove-btn:hover { background:darkred; }
+.total { margin-top:20px; font-size:22px; font-weight:bold; text-align: right; color: #222; }
+.checkout { margin-top:15px; padding:15px; width:100%; background:black; color:white; border:none; border-radius:10px; font-size:18px; font-weight: bold; cursor:pointer; transition: 0.3s; }
+.checkout:hover { background:#333; transform: translateY(-2px); }
+.continue { margin-top:10px; padding:12px; width:100%; background:#f0f0f0; color:#333; border-radius:10px; font-size:16px; cursor:pointer; text-align:center; border:1px solid #ccc; display: block; text-decoration: none; }
 </style>
 
 </head>
 <body>
 
 <div class="container">
-
     <h2>🛒 My Cart</h2>
-
     <div id="cartItems"></div>
-
-    <div class="total" id="total"></div>
-
-    <button class="checkout">Proceed to Checkout</button>
-    <button class="continue" onclick="goHome()">Continue Shopping</button>
-
+    <div class="total" id="total">Total: ₹0</div>
+    
+    <button class="checkout" onclick="proceedToPayment()">Proceed to Checkout</button>
+    <a href="Home.html" class="continue">Continue Shopping</a>
 </div>
 
 <script>
+/** * GLOBAL VARIABLES
+ * Retrieving cart data from LocalStorage
+ */
 let cart = JSON.parse(localStorage.getItem("cart")) || [];
 let container = document.getElementById("cartItems");
+let totalDisplay = document.getElementById("total");
 let totalPrice = 0;
 
+/** * STEP 1: LOAD CART FUNCTION
+ * Renders the products on the screen and calculates total price.
+ */
 function loadCart() {
-    container.innerHTML = "";
-    totalPrice = 0;
+    container.innerHTML = ""; 
+    totalPrice = 0;           
 
     if(cart.length === 0) {
-        container.innerHTML = "<p>Your cart is empty 😢</p>";
-        document.getElementById("total").innerText = "";
+        container.innerHTML = "<div style='text-align:center; padding:50px;'><h3>Your cart is empty 😢</h3></div>";
+        totalDisplay.innerText = "Total: ₹0";
         return;
     }
 
     cart.forEach((item, index) => {
         totalPrice += item.price;
-
         container.innerHTML += `
             <div class="cart-item">
                 <img src="${item.image}" alt="${item.name}">
@@ -65,24 +70,50 @@ function loadCart() {
                     <h4>${item.name}</h4>
                     <p>₹${item.price}</p>
                 </div>
-                <button onclick="removeItem(${index})">Remove</button>
+                <button class="remove-btn" onclick="removeItem(${index})">Remove</button>
             </div>
         `;
     });
-
-    document.getElementById("total").innerText = "Total: ₹" + totalPrice;
+    totalDisplay.innerText = "Total: ₹" + totalPrice;
 }
 
+/** * STEP 2: REMOVE ITEM FUNCTION
+ * Deletes an item from cart and updates LocalStorage.
+ */
 function removeItem(index) {
     cart.splice(index, 1);
     localStorage.setItem("cart", JSON.stringify(cart));
     loadCart();
 }
 
-function goHome() {
-    window.location.href = "home.html";
+/** * STEP 3: PROCEED TO PAYMENT
+ * Instead of saving to Firebase directly, we move to the payment page.
+ * We save the 'Pending Order' details in LocalStorage for the payment page to use.
+ */
+function proceedToPayment() {
+    if (cart.length === 0) {
+        alert("Please add items to your cart first!");
+        return;
+    }
+
+    // Creating a temporary order object
+    const pendingOrder = {
+        order_id: "BX" + Math.floor(100000 + Math.random() * 900000),
+        items: cart,
+        total_amount: totalPrice,
+        customer_name: "Pratap Goral", 
+        status: "Pending Payment"
+    };
+
+    // Saving details to LocalStorage so 'Payment.html' can access it
+    localStorage.setItem("pendingOrder", JSON.stringify(pendingOrder));
+    localStorage.setItem("finalBill", totalPrice);
+
+    // Redirecting to Payment Page
+    window.location.href = "Payment.html";
 }
 
+// Initial call to display cart content on page load
 loadCart();
 </script>
 

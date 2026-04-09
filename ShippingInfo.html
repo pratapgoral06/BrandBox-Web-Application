@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shipping Information - BrandBox</title>
+
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+<style>
+    /* CSS: Visual styling for the Shipping Form */
+    body { font-family: 'Segoe UI', sans-serif; background: #f4f7f6; margin: 0; padding: 20px; }
+    .container { max-width: 550px; margin: 30px auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
+    
+    h2 { color: #333; margin-bottom: 10px; text-align: center; }
+    p.subtitle { text-align: center; color: #888; font-size: 14px; margin-bottom: 25px; }
+    
+    .form-group { margin-bottom: 15px; }
+    label { display: block; margin-bottom: 5px; font-weight: 600; color: #444; }
+    input, textarea { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 15px; box-sizing: border-box; }
+    
+    /* Layout for City and Pincode in the same row */
+    .row { display: flex; gap: 15px; }
+    .row .form-group { flex: 1; }
+
+    /* Button Styling */
+    .ship-btn { width: 100%; padding: 15px; background: #28a745; color: white; border: none; border-radius: 8px; font-size: 17px; font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: 10px; }
+    .ship-btn:hover { background: #218838; transform: translateY(-2px); }
+    
+    .back-btn { display: block; text-align: center; margin-top: 15px; color: #666; text-decoration: none; font-size: 14px; }
+</style>
+</head>
+<body>
+
+<div class="container">
+    <h2>🚚 Shipping Details</h2>
+    <p class="subtitle">Please provide your delivery address below</p>
+
+    <form id="shippingForm">
+        <div class="form-group">
+            <label>Full Name</label>
+            <input type="text" id="fullName" placeholder="Enter receiver's name" required>
+        </div>
+
+        <div class="form-group">
+            <label>Phone Number</label>
+            <input type="tel" id="phone" placeholder="10-digit mobile number" pattern="[0-9]{10}" required>
+        </div>
+
+        <div class="form-group">
+            <label>Full Address</label>
+            <textarea id="address" rows="3" placeholder="House No, Building, Street, Area" required></textarea>
+        </div>
+
+        <div class="row">
+            <div class="form-group">
+                <label>City</label>
+                <input type="text" id="city" placeholder="City" required>
+            </div>
+            <div class="form-group">
+                <label>Pincode</label>
+                <input type="text" id="pincode" placeholder="6-digit Pincode" pattern="[0-9]{6}" required>
+            </div>
+        </div>
+
+        <button type="submit" class="ship-btn">Save Shipping Address</button>
+    </form>
+
+    <a href="home.html" class="back-btn">← Back to Home Page</a>
+</div>
+
+<script>
+/** * STEP 1: FIREBASE CONFIGURATION 
+ * Linked to your project: brandbox-11fb7
+ */
+const firebaseConfig = {
+    apiKey: "AIzaSyAmqyEPpanrmKD7rDz0aA6M_Un0bGFnevk",
+    authDomain: "brandbox-11fb7.firebaseapp.com",
+    projectId: "brandbox-11fb7",
+    storageBucket: "brandbox-11fb7.firebasestorage.app",
+    messagingSenderId: "214410646376",
+    appId: "1:214410646376:web:e8cd435ecd821dccec7cdd"
+};
+
+// Initialize Firebase App and Firestore Database Service
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+/** * STEP 2: FORM SUBMISSION LOGIC
+ * This function handles the "Submit" event and sends data to Firebase.
+ */
+document.getElementById("shippingForm").addEventListener("submit", function(e) {
+    e.preventDefault(); // Prevents the page from refreshing on submit
+
+    // Object containing user-entered shipping information
+    const shippingData = {
+        customer_name: document.getElementById("fullName").value,
+        mobile_number: document.getElementById("phone").value,
+        full_address: document.getElementById("address").value,
+        city: document.getElementById("city").value,
+        pincode: document.getElementById("pincode").value,
+        created_at: new Date().toLocaleString() // Adds the current date and time
+    };
+
+    // Firebase Command: Adds the object to 'shipping_details' collection
+    db.collection("shipping_details").add(shippingData)
+    .then(() => {
+        // Success: Notify user and clear form
+        alert("✅ Shipping information saved successfully!");
+        document.getElementById("shippingForm").reset(); 
+    })
+    .catch((error) => {
+        // Error: Show error message if database fails
+        console.error("Firebase Error: ", error);
+        alert("Failed to save shipping info. Please check console.");
+    });
+});
+</script>
+
+</body>
+</html>
