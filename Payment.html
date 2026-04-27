@@ -85,16 +85,35 @@ const db = firebase.firestore();
 // Get data from LocalStorage
 const totalAmount = localStorage.getItem("finalBill") || 0;
 const pendingOrder = JSON.parse(localStorage.getItem("pendingOrder"));
+const cartItems = JSON.parse(localStorage.getItem("cart")) || []; // Get cart for inventory update
 
 // Update Display Amount
 document.getElementById("displayTotal").innerText = "Total Payable: ₹" + totalAmount;
 
-// English Comment: Generate QR Code dynamically using totalAmount
-// Replace 'yourvpa@upi' with your real UPI ID if testing for real payments
+// Generate QR Code dynamically
 const upiID = "pratap@okaxis"; 
 const qrImg = document.getElementById("qrDisplay");
 const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=${upiID}&pn=BrandBox&am=${totalAmount}&cu=INR`;
 qrImg.src = qrApiUrl;
+
+/** * NEW FUNCTION: UPDATE STOCK IN FIREBASE
+ * This will look for the product name and reduce its stock by 1
+ */
+function updateInventory() {
+    cartItems.forEach(item => {
+        db.collection("products").where("name", "==", item.name).get()
+        .then((querySnapshot) => {
+            querySnapshot.forEach((doc) => {
+                const currentStock = doc.data().stock;
+                if (currentStock > 0) {
+                    db.collection("products").doc(doc.id).update({
+                        stock: currentStock - 1
+                    });
+                }
+            });
+        });
+    });
+}
 
 /** * STEP 2: PROCESS PAYMENT FUNCTION */
 function processPayment() {
@@ -111,6 +130,9 @@ function processPayment() {
             status: "Confirmed"
         })
         .then(() => {
+            // CALLING INVENTORY UPDATE LOGIC HERE
+            updateInventory();
+
             document.getElementById("paymentArea").style.display = "none";
             document.getElementById("successBox").style.display = "block";
             document.getElementById("finalOrderID").innerText = pendingOrder.order_id;

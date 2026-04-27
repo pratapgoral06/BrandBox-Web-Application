@@ -21,7 +21,7 @@ h2 { margin-bottom:20px; color: #333; }
 .details p { font-weight:bold; color:#1d4e89; font-size: 1.1rem; }
 .remove-btn { padding:8px 12px; border:none; background:#ff4d4d; color:white; border-radius:8px; cursor:pointer; transition: 0.3s; }
 .remove-btn:hover { background:darkred; }
-.total { margin-top:20px; font-size:22px; font-weight:bold; text-align: right; color: #222; }
+.total { margin-top:20px; font-size:22px; font-weight:bold; text-align: right; color: #222; border-top: 2px solid #ddd; padding-top: 15px; }
 .checkout { margin-top:15px; padding:15px; width:100%; background:black; color:white; border:none; border-radius:10px; font-size:18px; font-weight: bold; cursor:pointer; transition: 0.3s; }
 .checkout:hover { background:#333; transform: translateY(-2px); }
 .continue { margin-top:10px; padding:12px; width:100%; background:#f0f0f0; color:#333; border-radius:10px; font-size:16px; cursor:pointer; text-align:center; border:1px solid #ccc; display: block; text-decoration: none; }
@@ -40,20 +40,18 @@ h2 { margin-bottom:20px; color: #333; }
 </div>
 
 <script>
-/** * GLOBAL VARIABLES
- * Retrieving cart data from LocalStorage
- */
+/** * GLOBAL VARIABLES */
 let cart = JSON.parse(localStorage.getItem("cart")) || [];
 let container = document.getElementById("cartItems");
 let totalDisplay = document.getElementById("total");
 let totalPrice = 0;
 
-/** * STEP 1: LOAD CART FUNCTION
- * Renders the products on the screen and calculates total price.
+/** * STEP 1: LOAD CART FUNCTION 
+ * Fixed: Using Number() to ensure price calculation is mathematical and not text joining.
  */
 function loadCart() {
     container.innerHTML = ""; 
-    totalPrice = 0;           
+    totalPrice = 0; 
 
     if(cart.length === 0) {
         container.innerHTML = "<div style='text-align:center; padding:50px;'><h3>Your cart is empty 😢</h3></div>";
@@ -62,41 +60,38 @@ function loadCart() {
     }
 
     cart.forEach((item, index) => {
-        totalPrice += item.price;
+        // Ensure price is treated as a number
+        let itemPrice = Number(item.price); 
+        totalPrice += itemPrice;
+
         container.innerHTML += `
             <div class="cart-item">
                 <img src="${item.image}" alt="${item.name}">
                 <div class="details">
                     <h4>${item.name}</h4>
-                    <p>₹${item.price}</p>
+                    <p>₹${itemPrice.toLocaleString()}</p>
                 </div>
                 <button class="remove-btn" onclick="removeItem(${index})">Remove</button>
             </div>
         `;
     });
-    totalDisplay.innerText = "Total: ₹" + totalPrice;
+    totalDisplay.innerText = "Total Amount: ₹" + totalPrice.toLocaleString();
 }
 
-/** * STEP 2: REMOVE ITEM FUNCTION
- * Deletes an item from cart and updates LocalStorage.
- */
+/** * STEP 2: REMOVE ITEM FUNCTION */
 function removeItem(index) {
     cart.splice(index, 1);
     localStorage.setItem("cart", JSON.stringify(cart));
     loadCart();
 }
 
-/** * STEP 3: PROCEED TO PAYMENT
- * Instead of saving to Firebase directly, we move to the payment page.
- * We save the 'Pending Order' details in LocalStorage for the payment page to use.
- */
+/** * STEP 3: PROCEED TO PAYMENT */
 function proceedToPayment() {
     if (cart.length === 0) {
         alert("Please add items to your cart first!");
         return;
     }
 
-    // Creating a temporary order object
     const pendingOrder = {
         order_id: "BX" + Math.floor(100000 + Math.random() * 900000),
         items: cart,
@@ -105,15 +100,13 @@ function proceedToPayment() {
         status: "Pending Payment"
     };
 
-    // Saving details to LocalStorage so 'Payment.html' can access it
     localStorage.setItem("pendingOrder", JSON.stringify(pendingOrder));
     localStorage.setItem("finalBill", totalPrice);
 
-    // Redirecting to Payment Page
     window.location.href = "Payment.html";
 }
 
-// Initial call to display cart content on page load
+// Initial call
 loadCart();
 </script>
 

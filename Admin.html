@@ -12,25 +12,38 @@
     /* Main Styles for Screen */
     body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; padding: 30px; margin: 0; }
     .container { max-width: 1200px; margin: auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
-    h2 { color: #222; margin-bottom: 20px; }
+    h2, h3 { color: #222; margin-bottom: 20px; border-bottom: 2px solid #eee; padding-bottom: 10px; }
     
-    /* Buttons */
+    /* NEW: Inventory Form Styling */
+    .inventory-form-box { background: #fafafa; padding: 20px; border-radius: 10px; border: 1px solid #ddd; margin-bottom: 40px; }
+    .form-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
+    .input-group { margin-bottom: 10px; }
+    .input-group label { display: block; font-weight: bold; margin-bottom: 5px; font-size: 14px; }
+    .input-group input, .input-group select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
+    .submit-btn { background: #000; color: white; width: 100%; padding: 12px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 10px; transition: 0.3s; grid-column: span 2; }
+    .submit-btn:hover { background: #333; }
+
+    /* Buttons Styling */
     .btn-group { float: right; margin-bottom: 20px; }
     .btn { padding: 12px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; margin-left: 10px; transition: 0.3s; }
     .refresh-btn { background: #007bff; color: white; }
     .print-btn { background: #28a745; color: white; }
     .btn:hover { opacity: 0.8; transform: translateY(-2px); }
 
+    /* Delete Button Styling */
+    .del-btn { background: #ff4d4d; color: white; border: none; padding: 8px 12px; border-radius: 5px; cursor: pointer; font-size: 12px; font-weight: bold; }
+    .del-btn:hover { background: #cc0000; }
+
     /* Table Styling */
-    table { width: 100%; border-collapse: collapse; margin-top: 25px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 25px; margin-bottom: 50px; }
     th, td { padding: 15px; text-align: left; border-bottom: 1px solid #eee; }
     th { background: #1a1a1a; color: white; text-transform: uppercase; font-size: 14px; }
     
     .status-badge { padding: 6px 12px; background: #d4edda; color: #155724; border-radius: 50px; font-size: 13px; font-weight: 600; }
 
-    /* PRINT STYLES: This hides buttons when printing the report */
+    /* PRINT STYLES: This hides forms and buttons when printing */
     @media print {
-        .btn-group, .refresh-btn, .print-btn { display: none !important; }
+        .btn-group, .refresh-btn, .print-btn, .action-col, .inventory-form-box { display: none !important; }
         body { background: white; padding: 0; }
         .container { box-shadow: none; border: none; width: 100%; max-width: 100%; }
         h2::after { content: " - Sales Report"; }
@@ -40,13 +53,45 @@
 <body>
 
 <div class="container">
+    
+    <div class="inventory-form-box">
+        <h3>🚀 Add New Inventory (Hybrid Stock Management)</h3>
+        <form id="inventoryEntryForm">
+            <div class="form-grid">
+                <div class="input-group">
+                    <label>Product Name</label>
+                    <input type="text" id="itemName" placeholder="e.g. Trendy Cotton Shirt" required>
+                </div>
+                <div class="input-group">
+                    <label>Price (₹)</label>
+                    <input type="number" id="itemPrice" placeholder="e.g. 1299" required>
+                </div>
+                <div class="input-group">
+                    <label>Category</label>
+                    <select id="itemCategory">
+                        <option value="Men">Men's Collection</option>
+                        <option value="Women">Women's Collection</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>Initial Stock Quantity</label>
+                    <input type="number" id="itemStock" placeholder="e.g. 10" required>
+                </div>
+                <div class="input-group" style="grid-column: span 2;">
+                    <label>Image URL (Link from Unsplash/Firebase)</label>
+                    <input type="text" id="itemImageUrl" placeholder="Paste image link here..." required>
+                </div>
+                <button type="submit" class="submit-btn">ADD TO MARKETPLACE</button>
+            </div>
+        </form>
+    </div>
+
     <div class="btn-group">
-        <button class="btn refresh-btn" onclick="fetchOrders()">🔄 Refresh</button>
+        <button class="btn refresh-btn" onclick="refreshDashboard()">🔄 Refresh All</button>
         <button class="btn print-btn" onclick="generateReport()">🖨️ Download Report</button>
     </div>
     
-    <h2>📦 BrandBox Admin Dashboard</h2>
-
+    <h2>📦 BrandBox Sales & Order Dashboard</h2>
     <table>
         <thead>
             <tr>
@@ -55,10 +100,24 @@
                 <th>Customer Name</th>
                 <th>Amount (₹)</th>
                 <th>Status</th>
+                <th class="action-col">Action</th>
             </tr>
         </thead>
-        <tbody id="orderTableBody">
-            </tbody>
+        <tbody id="orderTableBody"></tbody>
+    </table>
+
+    <h2 style="color: #007bff;">🛠️ Manage Products & Live Stock</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Product Name</th>
+                <th>Category</th>
+                <th>Price</th>
+                <th>Stock Left</th>
+                <th class="action-col">Action</th>
+            </tr>
+        </thead>
+        <tbody id="inventoryTableBody"></tbody>
     </table>
 </div>
 
@@ -76,10 +135,31 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-/** * FETCH ORDERS FROM FIREBASE */
+/** * ADD PRODUCT LOGIC */
+const productForm = document.getElementById('inventoryEntryForm');
+productForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const name = document.getElementById('itemName').value;
+    const price = parseInt(document.getElementById('itemPrice').value);
+    const category = document.getElementById('itemCategory').value;
+    const stock = parseInt(document.getElementById('itemStock').value);
+    const image = document.getElementById('itemImageUrl').value;
+
+    try {
+        await db.collection("products").add({
+            name, price, category, stock, image,
+            added_at: new Date().toLocaleString()
+        });
+        alert("Product added successfully!");
+        productForm.reset();
+        fetchInventory(); // Refresh list immediately
+    } catch (error) { alert("Error adding product."); }
+});
+
+/** * FETCH ORDERS */
 function fetchOrders() {
     const tableBody = document.getElementById("orderTableBody");
-    tableBody.innerHTML = "<tr><td colspan='5' style='text-align:center;'>Loading...</td></tr>";
+    tableBody.innerHTML = "<tr><td colspan='6' style='text-align:center;'>Loading Orders...</td></tr>";
 
     db.collection("orders").orderBy("order_date", "desc").get()
       .then((querySnapshot) => {
@@ -93,28 +173,66 @@ function fetchOrders() {
                       <td>${order.customer_name}</td>
                       <td>₹${order.total_amount}</td>
                       <td><span class="status-badge">${order.status}</span></td>
+                      <td class="action-col"><button class="del-btn" onclick="deleteOrder('${doc.id}')">Delete 🗑️</button></td>
                   </tr>
               `;
           });
       });
 }
 
-/** * GENERATE REPORT FUNCTION
- * This opens the system print dialog. 
- * Users can select "Save as PDF" to download the report.
- */
-function generateReport() {
-    // Check if there is data to print
-    const rows = document.querySelectorAll("#orderTableBody tr");
-    if (rows.length === 0 || rows[0].innerText.includes("Loading")) {
-        alert("कृपया आधी डेटा लोड होऊ द्या!");
-        return;
-    }
-    window.print(); // Native browser print function
+/** * FETCH INVENTORY (NEW) */
+function fetchInventory() {
+    const invBody = document.getElementById("inventoryTableBody");
+    invBody.innerHTML = "<tr><td colspan='5' style='text-align:center;'>Loading Inventory...</td></tr>";
+
+    db.collection("products").get().then((querySnapshot) => {
+        invBody.innerHTML = "";
+        querySnapshot.forEach((doc) => {
+            const p = doc.data();
+            invBody.innerHTML += `
+                <tr>
+                    <td>${p.name}</td>
+                    <td>${p.category}</td>
+                    <td>₹${p.price}</td>
+                    <td><strong style="color:${p.stock > 0 ? 'green' : 'red'};">${p.stock}</strong></td>
+                    <td class="action-col">
+                        <button class="del-btn" onclick="deleteProduct('${doc.id}')">Remove 🗑️</button>
+                    </td>
+                </tr>
+            `;
+        });
+    });
 }
 
-// Initial Call
-window.onload = fetchOrders;
+/** * DELETE ORDER */
+function deleteOrder(docId) {
+    if (confirm("Delete this order record?")) {
+        db.collection("orders").doc(docId).delete().then(() => {
+            alert("Order Deleted!");
+            fetchOrders();
+        });
+    }
+}
+
+/** * DELETE PRODUCT FROM INVENTORY (NEW) */
+function deleteProduct(docId) {
+    if (confirm("Remove this product from your website permanently?")) {
+        db.collection("products").doc(docId).delete().then(() => {
+            alert("Product Removed!");
+            fetchInventory();
+        });
+    }
+}
+
+/** * REFRESH ALL TABLES */
+function refreshDashboard() {
+    fetchOrders();
+    fetchInventory();
+}
+
+function generateReport() { window.print(); }
+
+window.onload = refreshDashboard;
 </script>
 
 </body>

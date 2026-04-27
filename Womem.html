@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Women's Collection - BrandBox</title>
+
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
     <style>
         body { font-family: 'Segoe UI', sans-serif; background:#f4f7f6; margin:0; padding:0; }
         .container { max-width: 1500px; margin: auto; padding: 20px; }
@@ -20,12 +24,11 @@
         /* 5-Column Grid Styling */
         .grid {
             display: grid;
-            grid-template-columns: repeat(5, 1fr); /* This makes it 5 columns */
+            grid-template-columns: repeat(5, 1fr); 
             gap: 20px; 
             margin-top: 30px;
         }
 
-        /* Responsive: Laptop/Tablet वर ४ आणि मोबाईलवर २ कॉलम्स */
         @media (max-width: 1200px) { .grid { grid-template-columns: repeat(4, 1fr); } }
         @media (max-width: 992px) { .grid { grid-template-columns: repeat(3, 1fr); } }
         @media (max-width: 600px) { .grid { grid-template-columns: repeat(2, 1fr); } }
@@ -55,6 +58,9 @@
             background: #fe4c50; color: white; border-radius: 50%; 
             padding: 2px 7px; font-size: 12px; position: absolute; top: -5px; right: -10px; 
         }
+
+        /* Stock Badge for Dynamic Products */
+        .stock-badge { font-size: 12px; margin-bottom: 8px; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -69,167 +75,58 @@
     </div>
 
     <h2 style="margin-top: 30px; border-left: 5px solid #fe4c50; padding-left: 15px;">Women's Premium Collection (25 Items)</h2>
-
     <div class="grid" id="womenProductGrid"></div>
+
+    <hr style="margin: 60px 0 40px; border: 0; border-top: 2px dashed #ccc;">
+    <h2 style="border-left: 5px solid #000; padding-left: 15px;">🔥 New Arrivals (Live Stock)</h2>
+    <div class="grid" id="dynamicWomenGrid">
+        </div>
 </div>
 
-<script src="Home.js"></script>
-
 <script>
-    // 25 Unique Products with different images
+    /** * STEP 1: FIREBASE CONFIGURATION */
+    const firebaseConfig = {
+        apiKey: "AIzaSyAmqyEPpanrmKD7rDz0aA6M_Un0bGFnevk",
+        authDomain: "brandbox-11fb7.firebaseapp.com",
+        projectId: "brandbox-11fb7",
+        storageBucket: "brandbox-11fb7.firebasestorage.app",
+        messagingSenderId: "214410646376",
+        appId: "1:214410646376:web:e8cd435ecd821dccec7cdd"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    // Static Products Array
     const womenProducts = [
-       { 
-            name: "Floral Maxi Dress", 
-            price: 1899, 
-            img: "https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?w=400", 
-            desc: "Elegant georgette floral dress. | Sizes: S, M, L, XL, XXL | Material: Soft Georgette | Care: Gentle Hand Wash | Styling Tip: Pair with wedges and a sun hat for a perfect brunch look." 
-        },
-        { 
-            name: "Denim Trucker Jacket", 
-            price: 2499, 
-            img: "https://images.unsplash.com/photo-1544441893-675973e31985?w=400", 
-            desc: "Classic heavy denim jacket. | Sizes: M, L, XL | Material: 100% Cotton Denim | Care: Machine Wash Cold | Styling Tip: Layer it over a white tee or a floral dress." 
-        },
-        { 
-            name: "High Rise Skinny Jeans", 
-            price: 1599, 
-            img: "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?w=400", 
-            desc: "Super stretchable high-waist jeans. | Sizes: 28, 30, 32, 34 | Material: Denim Lycra | Care: Wash Inside Out | Styling Tip: Wear with a tucked-in shirt and sneakers." 
-        },
-        { 
-            name: "White Peplum Top", 
-            price: 899, 
-            img: "https://images.unsplash.com/photo-1585487000160-6ebcfceb0d03?w=400", 
-            desc: "Classy peplum top for work. | Sizes: S, M, L, XL | Material: Rayon Blend | Care: Steam Iron Only | Styling Tip: Looks best with formal trousers or pencil skirts." 
-        },
-        { 
-            name: "Yellow Sundress", 
-            price: 1200, 
-            img: "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=400", 
-            desc: "Breathable cotton sundress. | Sizes: S, M, L | Material: Pure Mul Cotton | Care: Hand Wash | Styling Tip: Perfect with flat sandals and minimal jewelry." 
-        },
-        { 
-            name: "Red Evening Gown", 
-            price: 4999, 
-            img: "https://media.istockphoto.com/id/1217970858/photo/beautiful-female-red-dress-without-sleeves-isolated-on-white-evening-dress.jpg?s=2048x2048&w=is&k=20&c=Bvr1FkW9xyjNx8TytIlIToElJL3d5eoFdO3cjvKoWb0=", 
-            desc: "Royal velvet gown for gala events. | Sizes: M, L, XL | Material: Premium Micro Velvet | Care: Dry Clean Only | Styling Tip: Style with statement earrings and high heels." 
-        },
-        { 
-            name: "Oversized Knit Sweater", 
-            price: 1750, 
-            img: "https://images.unsplash.com/photo-1434389677669-e08b4cac3105?w=400", 
-            desc: "Cozy oversized winter wear. | Sizes: Free Size (S-XL) | Material: Acrylic Wool | Care: Flat Dry | Styling Tip: Pair with leggings and ankle boots for a winter vibe." 
-        },
-        { 
-            name: "Bohemian Midi Skirt", 
-            price: 1100, 
-            img: "https://images.unsplash.com/photo-1582142306909-195724d33ffc?w=400", 
-            desc: "Flowy bohemian pleated skirt. | Sizes: S, M, L, XL | Material: Satin Finish Polyester | Care: Machine Wash | Styling Tip: Team it up with a solid crop top." 
-        },
-        { 
-            name: "Embroidered Cotton Kurti", 
-            price: 1350, 
-            img: "https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?w=400", 
-            desc: "Hand-embroidered ethnic kurti. | Sizes: M to XXL | Material: Lucknowi Chanderi | Care: Hand Wash | Styling Tip: Wear with white palazzos or silver jhumkas." 
-        },
-        { 
-            name: "Pastel Pink Blazer", 
-            price: 2800, 
-            img: "https://media.istockphoto.com/id/1463403027/photo/vertical-shot-of-the-fashionable-pink-blazer-isolated-on-the-white-background.jpg?s=2048x2048&w=is&k=20&c=XOVW6barjFWgpL8LN8jFfUWEZQ5G5Qkv-QBAx_g6eV4=", 
-            desc: "Sharp business formal blazer. | Sizes: S, M, L | Material: Structured Twill | Care: Professional Dry Clean | Styling Tip: Perfect for a 'Boss Lady' office look." 
-        },
-        { 
-            name: "Striped Summer Jumpsuit", 
-            price: 1999, 
-            img: "https://media.istockphoto.com/id/878234044/photo/black-sleeveles-short-cotton-dress.jpg?s=2048x2048&w=is&k=20&c=Bshr2RWHPCCFzuXbsCLoZ_t9_GrK1jIfx2wAm4bkOaU=", 
-            desc: "Chic striped full-length jumpsuit. | Sizes: S, M, L | Material: Breathable Crepe | Care: Easy Wash | Styling Tip: Add a waist belt to accentuate the fit." 
-        },
-        { 
-            name: "Classic Beige Trench", 
-            price: 5500, 
-            img: "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=400", 
-            desc: "Timeless winter trench coat. | Sizes: M, L, XL | Material: Gabardine Cotton | Care: Dry Clean | Styling Tip: Drape it over any formal or casual outfit." 
-        },
-        { 
-            name: "Utility Cargo Pants", 
-            price: 1450, 
-            img: "https://media.istockphoto.com/id/181865530/photo/cargo-pants.jpg?s=2048x2048&w=is&k=20&c=o1p7wCse5Pbd2Cr3gALkzCT_7lwrDhVIHN3Ff6___jg=", 
-            desc: "Rugged cargo pants with 6 pockets. | Sizes: 28, 30, 32 | Material: Cotton Canvas | Care: Machine Wash | Styling Tip: Match with a combat boot and a crop tee." 
-        },
-        { 
-            name: "High Performance Leggings", 
-            price: 999, 
-            img: "https://images.unsplash.com/photo-1506629082955-511b1aa562c8?w=400", 
-            desc: "Squat-proof yoga leggings. | Sizes: S, M, L, XL | Material: Spandex Blend | Care: Cold Wash | Styling Tip: Ideal for gym sessions or morning yoga." 
-        },
-        { 
-            name: "Satin Champagne Top", 
-            price: 1150, 
-            img: "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=400", 
-            desc: "Luxurious satin wrap top. | Sizes: S, M, L | Material: Liquid Satin | Care: Hand Wash Cold | Styling Tip: Pair with black trousers for a dinner date." 
-        },
-        { 
-            name: "Polka Dot Midi Skirt", 
-            price: 850, 
-            img: "https://images.unsplash.com/photo-1582142306909-195724d33ffc?w=400", 
-            desc: "Retro 90s style polka skirt. | Sizes: S, M, L | Material: Lightweight Rayon | Care: Gentle Wash | Styling Tip: Wear with a knotted white t-shirt." 
-        },
-        { 
-            name: "Ribbed Turtle Neck", 
-            price: 799, 
-            img: "https://images.unsplash.com/photo-1616150638538-ffb0679a3fc4?w=400", 
-            desc: "Slim-fit ribbed turtleneck. | Sizes: S, M, L | Material: Fine Knit Cotton | Care: Machine Wash | Styling Tip: Excellent for layering under jackets." 
-        },
-        { 
-            name: "Emerald Two-Piece Suit", 
-            price: 6200, 
-            img: "https://media.istockphoto.com/id/2179522589/photo/emerald-green-velvet-sweatshirt-for-women-at-marble-background-flat-lay-velour-sports-long.jpg?s=2048x2048&w=is&k=20&c=fPDycPDLBZdB5x6piY7kd1E5hWKg34mYpzeUFdq0L2Q=", 
-            desc: "Premium emerald green suit set. | Sizes: S, M, L, XL | Material: Luxury Suiting Fabric | Care: Dry Clean | Styling Tip: Style with black pumps and a clutch." 
-        },
-        { 
-            name: "Feminist Graphic Tee", 
-            price: 499, 
-            img: "https://images.unsplash.com/photo-1554568218-0f1715e72254?w=400", 
-            desc: "100% organic cotton graphic tee. | Sizes: S to XXL | Material: Bio-washed Cotton | Care: Iron on Reverse | Styling Tip: Tuck into high-waist shorts." 
-        },
-        { 
-            name: "Plaid Formal Trousers", 
-            price: 1650, 
-            img: "https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=400", 
-            desc: "Checked slim-fit office trousers. | Sizes: 28, 30, 32, 34 | Material: Poly-Cotton Blend | Care: Machine Wash | Styling Tip: Perfect with a crisp white shirt." 
-        },
-        { 
-            name: "Biker Leather Jacket", 
-            price: 4200, 
-            img: "https://images.unsplash.com/photo-1551028719-00167b16eac5?w=400", 
-            desc: "Edgy vegan leather jacket. | Sizes: S, M, L, XL | Material: Faux Leather | Care: Wipe Clean Only | Styling Tip: Throw over a hoodie for a street look." 
-        },
-        { 
-            name: "Sheer Chiffon Top", 
-            price: 1250, 
-            img: "https://images.unsplash.com/photo-1539109136881-3be0616acf4b?w=400", 
-            desc: "Chiffon top with floral details. | Sizes: S, M, L | Material: Imported Chiffon | Care: Hand Wash | Styling Tip: Wear with a camisole and skinny jeans." 
-        },
-        { 
-            name: "Pure Linen Wide Pants", 
-            price: 1800, 
-            img: "https://media.istockphoto.com/id/1501710186/photo/stylish-womens-clothing-looks-spectacular-on-a-girl-casual-clothes-street-fashion-fashion.jpg?s=2048x2048&w=is&k=20&c=PdUjXQaPDkgBW_LfYXfTY8_1V1r2U4ROGnMiaHLcL_Q=", 
-            desc: "Premium linen summer pants. | Sizes: S, M, L, XL | Material: 100% Belgian Linen | Care: Cold Wash | Styling Tip: Best for beach holidays and resort wear." 
-        },
-        { 
-            name: "Pink Quilted Vest", 
-            price: 2100, 
-            img: "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=400", 
-            desc: "Puffer vest for core warmth. | Sizes: M, L, XL | Material: Water-resistant Nylon | Care: Gentle Cycle | Styling Tip: Wear over a full-sleeve sweatshirt." 
-        },
-        { 
-            name: "Velvet Cocktail Dress", 
-            price: 2999, 
-            img: "https://images.unsplash.com/photo-1623609163915-d21853ad7d0c?w=400", 
-            desc: "Classic little black dress in velvet. | Sizes: XS, S, M, L | Material: Stretch Velvet | Care: Dry Clean | Styling Tip: Complete the look with red lipstick and heels." 
-        }
+        { name: "Floral Maxi Dress", price: 1899, img: "https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?w=400", desc: "Elegant georgette floral dress." },
+        { name: "Denim Trucker Jacket", price: 2499, img: "https://images.unsplash.com/photo-1544441893-675973e31985?w=400", desc: "Classic heavy denim jacket." },
+        { name: "High Rise Skinny Jeans", price: 1599, img: "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?w=400", desc: "Super stretchable high-waist jeans." },
+        { name: "White Peplum Top", price: 899, img: "https://images.unsplash.com/photo-1585487000160-6ebcfceb0d03?w=400", desc: "Classy peplum top for work." },
+        { name: "Yellow Sundress", price: 1200, img: "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=400", desc: "Breathable cotton sundress." },
+        { name: "Red Evening Gown", price: 4999, img: "https://media.istockphoto.com/id/1217970858/photo/beautiful-female-red-dress-without-sleeves-isolated-on-white-evening-dress.jpg?s=2048x2048&w=is&k=20&c=Bvr1FkW9xyjNx8TytIlIToElJL3d5eoFdO3cjvKoWb0=", desc: "Royal velvet gown for gala events." },
+        { name: "Oversized Knit Sweater", price: 1750, img: "https://images.unsplash.com/photo-1434389677669-e08b4cac3105?w=400", desc: "Cozy oversized winter wear." },
+        { name: "Bohemian Midi Skirt", price: 1100, img: "https://images.unsplash.com/photo-1582142306909-195724d33ffc?w=400", desc: "Flowy bohemian pleated skirt." },
+        { name: "Embroidered Cotton Kurti", price: 1350, img: "https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?w=400", desc: "Hand-embroidered ethnic kurti." },
+        { name: "Pastel Pink Blazer", price: 2800, img: "https://media.istockphoto.com/id/1463403027/photo/vertical-shot-of-the-fashionable-pink-blazer-isolated-on-the-white-background.jpg?s=2048x2048&w=is&k=20&c=XOVW6barjFWgpL8LN8jFfUWEZQ5G5Qkv-QBAx_g6eV4=", desc: "Sharp business formal blazer." },
+        { name: "Striped Summer Jumpsuit", price: 1999, img: "https://media.istockphoto.com/id/878234044/photo/black-sleeveles-short-cotton-dress.jpg?s=2048x2048&w=is&k=20&c=Bshr2RWHPCCFzuXbsCLoZ_t9_GrK1jIfx2wAm4bkOaU=", desc: "Chic striped full-length jumpsuit." },
+        { name: "Classic Beige Trench", price: 5500, img: "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=400", desc: "Timeless winter trench coat." },
+        { name: "Utility Cargo Pants", price: 1450, img: "https://media.istockphoto.com/id/181865530/photo/cargo-pants.jpg?s=2048x2048&w=is&k=20&c=o1p7wCse5Pbd2Cr3gALkzCT_7lwrDhVIHN3Ff6___jg=", desc: "Rugged cargo pants." },
+        { name: "High Performance Leggings", price: 999, img: "https://images.unsplash.com/photo-1506629082955-511b1aa562c8?w=400", desc: "Squat-proof yoga leggings." },
+        { name: "Satin Champagne Top", price: 1150, img: "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=400", desc: "Luxurious satin wrap top." },
+        { name: "Polka Dot Midi Skirt", price: 850, img: "https://images.unsplash.com/photo-1582142306909-195724d33ffc?w=400", desc: "Retro 90s style polka skirt." },
+        { name: "Ribbed Turtle Neck", price: 799, img: "https://images.unsplash.com/photo-1616150638538-ffb0679a3fc4?w=400", desc: "Slim-fit ribbed turtleneck." },
+        { name: "Emerald Two-Piece Suit", price: 6200, img: "https://media.istockphoto.com/id/2179522589/photo/emerald-green-velvet-sweatshirt-for-women-at-marble-background-flat-lay-velour-sports-long.jpg?s=2048x2048&w=is&k=20&c=fPDycPDLBZdB5x6piY7kd1E5hWKg34mYpzeUFdq0L2Q=", desc: "Premium emerald green suit set." },
+        { name: "Feminist Graphic Tee", price: 499, img: "https://images.unsplash.com/photo-1554568218-0f1715e72254?w=400", desc: "100% organic cotton graphic tee." },
+        { name: "Plaid Formal Trousers", price: 1650, img: "https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=400", desc: "Checked slim-fit office trousers." },
+        { name: "Biker Leather Jacket", price: 4200, img: "https://images.unsplash.com/photo-1551028719-00167b16eac5?w=400", desc: "Edgy vegan leather jacket." },
+        { name: "Sheer Chiffon Top", price: 1250, img: "https://images.unsplash.com/photo-1539109136881-3be0616acf4b?w=400", desc: "Chiffon top with floral details." },
+        { name: "Pure Linen Wide Pants", price: 1800, img: "https://media.istockphoto.com/id/1501710186/photo/stylish-womens-clothing-looks-spectacular-on-a-girl-casual-clothes-street-fashion-fashion.jpg?s=2048x2048&w=is&k=20&c=PdUjXQaPDkgBW_LfYXfTY8_1V1r2U4ROGnMiaHLcL_Q=", desc: "Premium linen summer pants." },
+        { name: "Pink Quilted Vest", price: 2100, img: "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=400", desc: "Puffer vest for core warmth." },
+        { name: "Velvet Cocktail Dress", price: 2999, img: "https://images.unsplash.com/photo-1623609163915-d21853ad7d0c?w=400", desc: "Classic little black dress in velvet." }
     ];
 
+    /** * LOAD STATIC PRODUCTS */
     function loadWomenProducts() {
         const grid = document.getElementById('womenProductGrid');
         womenProducts.forEach(p => {
@@ -245,13 +142,64 @@
         });
     }
 
+    /** * LOAD DYNAMIC PRODUCTS FROM FIREBASE */
+    function loadDynamicWomenProducts() {
+        const dynamicGrid = document.getElementById('dynamicWomenGrid');
+
+        db.collection("products").where("category", "==", "Women").get()
+        .then((querySnapshot) => {
+            if (querySnapshot.empty) {
+                dynamicGrid.innerHTML = "<p style='grid-column: span 5; color:#888;'>Dynamic collection coming soon!</p>";
+                return;
+            }
+
+            querySnapshot.forEach((doc) => {
+                const p = doc.data();
+                const card = document.createElement('div');
+                card.className = 'card';
+
+                // Stock Logic
+                let stockUI = p.stock > 0 ? `<span class="stock-badge" style="color:green;">Stock: ${p.stock}</span>` : `<span class="stock-badge" style="color:red;">Out of Stock</span>`;
+                let btnState = p.stock > 0 ? "" : "disabled style='background:gray; cursor:not-allowed;'";
+
+                card.innerHTML = `
+                    <img src="${p.image}" alt="${p.name}" onclick="viewDetails('${p.name}', ${p.price}, '${p.image}', 'Premium Arrival from BrandBox')">
+                    <h4>${p.name}</h4>
+                    <p class="price-text">₹${p.price}</p>
+                    ${stockUI}
+                    <button class="add-btn" ${btnState} onclick="addToCart('${p.name}', ${p.price}, '${p.image}')">
+                        ${p.stock > 0 ? 'Add to Cart' : 'Sold Out'}
+                    </button>
+                `;
+                dynamicGrid.appendChild(card);
+            });
+        });
+    }
+
+    function viewDetails(name, price, img, desc) {
+        localStorage.setItem("pName", name);
+        localStorage.setItem("pPrice", price);
+        localStorage.setItem("pImage", img); 
+        localStorage.setItem("pDesc", desc);
+        window.location.href = "ProductDetails.html";
+    }
+
+    function addToCart(name, price, image){
+        let cart = JSON.parse(localStorage.getItem("cart")) || [];
+        cart.push({name, price, image});
+        localStorage.setItem("cart", JSON.stringify(cart));
+        updateCount();
+        alert(name + " added to cart!");
+    }
+
     function updateCount(){
         let cart = JSON.parse(localStorage.getItem("cart")) || [];
         document.getElementById("count").innerText = cart.length;
     }
 
     window.onload = () => {
-        loadWomenProducts();
+        loadWomenProducts();       // Load Static Data
+        loadDynamicWomenProducts(); // Load Firebase Data
         updateCount();
     };
 </script>
